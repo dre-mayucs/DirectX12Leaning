@@ -1,0 +1,4 @@
+E:\Dev\Software\C++\DirecrX\DxLearn\x64\Debug\BasicPS.cso
+E:\Dev\Software\C++\DirecrX\DxLearn\x64\Debug\BasicVS.cso
+F:\Dev\Software\C++\DirecrX\DxLearn\x64\Debug\BasicPS.cso
+F:\Dev\Software\C++\DirecrX\DxLearn\x64\Debug\BasicVS.cso
