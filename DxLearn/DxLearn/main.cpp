@@ -100,12 +100,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	IDXGIAdapter1 *tmpAdapter = nullptr;
 
 	//Listup GPU
-	for (auto i = 0; dxgiFactory->EnumAdapters1(i, &tmpAdapter) != DXGI_ERROR_NOT_FOUND; i++) {
+	for (auto i = 0; dxgiFactory->EnumAdapters1(i, &tmpAdapter) != DXGI_ERROR_NOT_FOUND; ++i) {
 		adapters.push_back(tmpAdapter);
 	}
 
 	//Select GPU
-	for (auto i = 0; i < adapters.size(); i++) {
+	for (auto i = 0; i < adapters.size(); ++i) {
 		DXGI_ADAPTER_DESC1 adesc;
 		adapters[i]->GetDesc1(&adesc);
 
@@ -132,7 +132,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		D3D_FEATURE_LEVEL_11_0
 	};
 
-	for (auto i = 0; i < _countof(levels); i++) {
+	for (auto i = 0; i < _countof(levels); ++i) {
 		result = D3D12CreateDevice(tmpAdapter, levels[i], IID_PPV_ARGS(&dev));
 		if (result == S_OK) {
 			featurelevel = levels[i];
@@ -188,7 +188,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//target view
 	std::vector<ID3D12Resource *> backBuffers(2);
-	for (auto i = 0; i < 2; i++) {
+	for (auto i = 0; i < 2; ++i) {
 		result = swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
 		handle.ptr += i * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
@@ -236,9 +236,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #pragma region Initialize drawing command
 	XMFLOAT3 vertices[] = {
+		//Lower left
 		{ -.5f, -.5f, .0f },
 		{ -.5f, +.5f, .0f },
-		{ +.5f, -.5f, .0f }
+		{ +.5f, -.5f, .0f },
+
+		//Upper right
+		{ +.5f, -.5f, .0f },
+		{ -.5f, +.5f, .0f },
+		{ +.5f, +.5f, .0f },
 	};
 	UINT sizeVB = static_cast<UINT>(sizeof(XMFLOAT3) * _countof(vertices));
 
@@ -248,7 +254,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	heapprop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 	heapprop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 
-	D3D12_RESOURCE_DESC resdesc{};			//Resource setting
+	//Resource setting
+	D3D12_RESOURCE_DESC resdesc{};
 	resdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	resdesc.Width = sizeVB;
 	resdesc.Height = 1;
@@ -274,9 +281,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	XMFLOAT3 *vertMap = nullptr;
 	result = verBuff->Map(0, nullptr, (void **)&vertMap);
 	std::copy(std::begin(vertices), std::end(vertices), vertMap);
-	/*for (auto i = 0; i < _countof(vertices); i++ ) {
+	for (auto i = 0; i < _countof(vertices); ++i ) {
 		vertMap[i] = vertices[i];
-	}*/
+	}
 	verBuff->Unmap(0, nullptr);
 
 	//Create top buffer view
@@ -409,11 +416,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #pragma endregion
 
-
-		///
-		/// Frame process
-		/// 
-
+#pragma region Frame process
 		//Get buck buffer number
 		UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
 
@@ -440,6 +443,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 		}
 
+		//Move object if arrow right key pressed
+		if (key[DIK_RIGHT]) {
+			vertices[0].x += .1f;
+			vertices[1].x += .1f;
+			vertices[2].x += .1f;
+		}
+
+		//Get VirtualMemory
+		XMFLOAT3 *vertMap = nullptr;
+		result = verBuff->Map(0, nullptr, (void **)&vertMap);
+		std::copy(std::begin(vertices), std::end(vertices), vertMap);
+		verBuff->Unmap(0, nullptr);
+#pragma endregion
+
 #pragma region Draw command
 		//pipeline
 		cmdList->SetPipelineState(pipelinestate);
@@ -450,26 +467,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		viewport.Width = window_width;
 		viewport.Height = window_height;
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
+		viewport.TopLeftX = .0f;
+		viewport.TopLeftY = .0f;
 		viewport.MinDepth = .0f;
 		viewport.MaxDepth = 1.f;
 
 		cmdList->RSSetViewports(1, &viewport);
 
+		//Set scissorrect
 		D3D12_RECT scissorrect{};
-
-		scissorrect.left = 0;
+		scissorrect.left = 0.f;
 		scissorrect.right = scissorrect.left + window_width;
-		scissorrect.top = 0;
+		scissorrect.top = 0.f;
 		scissorrect.bottom = scissorrect.top + window_height;
 
 		cmdList->RSSetScissorRects(1, &scissorrect);
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		cmdList->IASetVertexBuffers(0, 1, &vbView);
-		cmdList->DrawInstanced(3, 1, 0, 0);
+		cmdList->DrawInstanced((int)_countof(vertices), 1, 0, 0);
 #pragma endregion
-
 
 		//Restore Resource barrier setting(writing inhibition)
 		barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
