@@ -1,4 +1,4 @@
-//API
+//API(Win)
 #include <Windows.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
@@ -12,7 +12,7 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
-//shader
+//shader(HLSL)
 #include <d3dcompiler.h>
 #pragma comment(lib, "d3dcompiler.lib")
 
@@ -233,19 +233,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	);
 #pragma endregion
 
-
 #pragma region Initialize drawing command
-	XMFLOAT3 vertices[] = {
-		//Lower left
+
+#pragma region Top buffer
+	/*XMFLOAT3 vertices[] = {
 		{ -.5f, -.5f, .0f },
 		{ -.5f, +.5f, .0f },
 		{ +.5f, -.5f, .0f },
+		{ +.5f, +.5f, .0f }
+	};*/
+	const unsigned int shape_size = 3;
+	XMFLOAT3 vertices[shape_size + 1];
+	for (auto i = 0; i < _countof(vertices) - 1; ++i) {
+		vertices[i] = {
+			sinf(XM_2PI / shape_size * (i + 1)) *(float)(window_width / window_height),
+			cosf(XM_2PI / shape_size * (i + 1)),
+			0.f,
+		};
+	}
+	vertices[shape_size] = {0, 0, 0};
 
-		//Upper right
-		{ +.5f, -.5f, .0f },
-		{ -.5f, +.5f, .0f },
-		{ +.5f, +.5f, .0f },
-	};
 	UINT sizeVB = static_cast<UINT>(sizeof(XMFLOAT3) * _countof(vertices));
 
 	//Top buffer setting
@@ -281,7 +288,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	XMFLOAT3 *vertMap = nullptr;
 	result = verBuff->Map(0, nullptr, (void **)&vertMap);
 	std::copy(std::begin(vertices), std::end(vertices), vertMap);
-	for (auto i = 0; i < _countof(vertices); ++i ) {
+	for (auto i = 0; i < _countof(vertices); ++i) {
 		vertMap[i] = vertices[i];
 	}
 	verBuff->Unmap(0, nullptr);
@@ -293,7 +300,43 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	/*vbView.SizeInBytes = sizeVB;*/
 	vbView.SizeInBytes = sizeof(vertices);
 	vbView.StrideInBytes = sizeof(XMFLOAT3);
+#pragma endregion
 
+#pragma region Index buffer
+	unsigned short indices[shape_size * 3] = {
+		0, 1, 3,
+		1, 2, 3,
+		2, 0, 3,
+	};
+
+	//Add index buffer
+	ID3D12Resource *indexBuff = nullptr;
+	resdesc.Width = sizeof(indices);
+	result = dev->CreateCommittedResource(
+		&heapprop,
+		D3D12_HEAP_FLAG_NONE,
+		&resdesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&indexBuff)
+	);
+
+	//Get virtual memory
+	unsigned short *indexMap = nullptr;
+	result = indexBuff->Map(0, nullptr, (void **)&indexMap);
+	for (int i = 0; i < _countof(indices); ++i) {
+		indexMap[i] = indices[i];
+	}
+	indexBuff->Unmap(0, nullptr);
+
+	//Create index buffer view
+	D3D12_INDEX_BUFFER_VIEW ibView{};
+	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
+	ibView.Format = DXGI_FORMAT_R16_UINT;
+	ibView.SizeInBytes = sizeof(indices);
+#pragma endregion
+
+#pragma region Shader
 	ID3DBlob *vsBlob = nullptr;
 	ID3DBlob *psBlob = nullptr;
 	ID3DBlob *errorBlob = nullptr;
@@ -317,6 +360,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		0,
 		&psBlob, &errorBlob
 	);
+#pragma endregion
 
 	//ErrorMsg
 	if (FAILED(result)) {
@@ -355,12 +399,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//SampleMask
 	//RasterizerState
+	//Fill mode
 	gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 	gpipeline.RasterizerState.MultisampleEnable = false;
 	gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	gpipeline.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 	gpipeline.RasterizerState.DepthClipEnable = true;
-	gpipeline.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	//Blend
+	//gpipeline.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	D3D12_RENDER_TARGET_BLEND_DESC &blenddesc = gpipeline.BlendState.RenderTarget[0];
+	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blenddesc.BlendEnable = true;
+	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+
+	//Alpha blend
+	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 
 	//top layout setting
 	gpipeline.InputLayout.pInputElementDescs = inputLayout;
@@ -444,11 +502,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 
 		//Move object if arrow right key pressed
-		if (key[DIK_RIGHT]) {
+		/*if (key[DIK_RIGHT]) {
 			vertices[0].x += .1f;
 			vertices[1].x += .1f;
 			vertices[2].x += .1f;
-		}
+		}*/
 
 		//Get VirtualMemory
 		XMFLOAT3 *vertMap = nullptr;
@@ -484,7 +542,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		cmdList->RSSetScissorRects(1, &scissorrect);
 		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		cmdList->IASetVertexBuffers(0, 1, &vbView);
-		cmdList->DrawInstanced((int)_countof(vertices), 1, 0, 0);
+
+		//Index buffer set command
+		cmdList->IASetIndexBuffer(&ibView);
+		cmdList->DrawIndexedInstanced((int)_countof(indices), 1, 0, 0, 0);
 #pragma endregion
 
 		//Restore Resource barrier setting(writing inhibition)
