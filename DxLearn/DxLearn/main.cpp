@@ -6,12 +6,6 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 
-//API(IO)
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
-
 //shader(HLSL)
 #include <d3dcompiler.h>
 #pragma comment(lib, "d3dcompiler.lib")
@@ -19,69 +13,27 @@
 //STL
 #include <vector>
 #include <string>
+#include <assert.h>
+
+//Utility
+#include <dinput.h>
+#include "Input.h"
+#include "Win32_Initialize.h"
+
+const int window_width = 1280;
+const int window_height = 720;
 
 //namespace
 using namespace DirectX;
 
-//WindowProcedure
-LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-{
-	if (msg == WM_DESTROY) {
-		PostQuitMessage(0);
-		return 0;
-	}
-
-	return DefWindowProc(hwnd, msg, wparam, lparam);
-}
-
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) 
 {
-#ifdef _DEBUG
-	ID3D12Debug *debugController;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
-		debugController->EnableDebugLayer();
-	}
-#endif // _DEBUG
-
-#pragma region WinAPI Initialize
-	OutputDebugStringA("Hello,DirectX!!\n");
-	const int window_width = 1280;
-	const int window_height = 720;
-
 	WNDCLASSEX w{};
-	w.cbSize = sizeof(WNDCLASSEX);
-	w.lpfnWndProc = (WNDPROC)WindowProc;
-	w.lpszClassName = L"DirectXGame";
-	w.hInstance = GetModuleHandle(nullptr);
-	w.hCursor = LoadCursor(NULL, IDC_ARROW);
-
-	//Window class add
-	RegisterClassEx(&w);
-
-	//Window Size
-	RECT wrc = { 0, 0, window_width, window_height };
-	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-	HWND hwnd = CreateWindow(
-		w.lpszClassName,		//Class name
-		L"DirectXGame",			//Title bar
-		WS_OVERLAPPEDWINDOW,	//Window type
-		CW_USEDEFAULT,			//Window position
-		CW_USEDEFAULT,			//Window position
-		wrc.right - wrc.left,	//Window width
-		wrc.bottom - wrc.top,	//Window height
-		nullptr,				//Window handle
-		nullptr,				//Menu handle
-		w.hInstance,			//Call application handke
-		nullptr					//param
-	);
-
-	//View window
-	ShowWindow(hwnd, SW_SHOW);
-
-	//Msg
 	MSG msg{};
-#pragma endregion
+	HWND hwnd;
+
+	Win32_Initialize win32_init;
+	win32_init.Win32_Initialize_Conponents(w, hwnd);
 
 #pragma region DirectX12 Initialize components
 	HRESULT result;
@@ -96,6 +48,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//Graphics adapter
 	result = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
+	assert(result == S_OK);
+
 	std::vector<IDXGIAdapter1 *> adapters;
 	IDXGIAdapter1 *tmpAdapter = nullptr;
 
@@ -134,19 +88,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	for (auto i = 0; i < _countof(levels); ++i) {
 		result = D3D12CreateDevice(tmpAdapter, levels[i], IID_PPV_ARGS(&dev));
+		assert(result == S_OK);
+
 		if (result == S_OK) {
 			featurelevel = levels[i];
 			break;
 		}
 	}
+	assert(result == S_OK);
 
-	//Genelate allocater
+	//Create allocater
 	result = dev->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		IID_PPV_ARGS(&cmdAllocator)
 	);
+	assert(result == S_OK);
 
-	//Genelate commandlist
+	//Create commandlist
 	result = dev->CreateCommandList(
 		0,
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -154,10 +112,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		nullptr,
 		IID_PPV_ARGS(&cmdList)
 	);
+	assert(result == S_OK);
 
 	//Command queue
 	D3D12_COMMAND_QUEUE_DESC cmdQueueDesc{};
-	dev->CreateCommandQueue(&cmdQueueDesc, IID_PPV_ARGS(&cmdQueue));
+	result = dev->CreateCommandQueue(&cmdQueueDesc, IID_PPV_ARGS(&cmdQueue));
+	assert(result == S_OK);
 
 	//Swap chain
 	DXGI_SWAP_CHAIN_DESC1 swapchainDesc{};
@@ -190,6 +150,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	std::vector<ID3D12Resource *> backBuffers(2);
 	for (auto i = 0; i < 2; ++i) {
 		result = swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
+		assert(result == S_OK);
+
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
 		handle.ptr += i * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
 		dev->CreateRenderTargetView(
@@ -203,51 +165,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ID3D12Fence *fence = nullptr;
 	UINT64 fenceVal = 0;
 	result = dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-#pragma endregion
-
-#pragma region DirectInput Initialize component
-	//Initialize
-	IDirectInput8 *dinput = nullptr;
-	result = DirectInput8Create(
-		w.hInstance,
-		DIRECTINPUT_VERSION, 
-		IID_IDirectInput8, 
-		(void**)&dinput, 
-		nullptr
-	);
-
-	//Create keybord device
-	IDirectInputDevice8 *devkeybord = nullptr;
-	result = dinput->CreateDevice(GUID_SysKeyboard, &devkeybord, NULL);
-
-	//Set data format
-	result = devkeybord->SetDataFormat(&c_dfDIKeyboard);
-
-	//Set cooperativel level
-	result = devkeybord->SetCooperativeLevel(
-		hwnd,
-		DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY
-		//Active window IO only
-		//No exclusive IO
-		//Invalidation Windows
-	);
+	assert(result == S_OK);
 #pragma endregion
 
 #pragma region Initialize drawing command
 
 #pragma region Top buffer
-	/*XMFLOAT3 vertices[] = {
-		{ -.5f, -.5f, .0f },
-		{ -.5f, +.5f, .0f },
-		{ +.5f, -.5f, .0f },
-		{ +.5f, +.5f, .0f }
-	};*/
-	const unsigned int shape_size = 3;
+	const unsigned int shape_size = 5;
+	float radius = 0.2f;
 	XMFLOAT3 vertices[shape_size + 1];
 	for (auto i = 0; i < _countof(vertices) - 1; ++i) {
 		vertices[i] = {
-			sinf(XM_2PI / shape_size * (i + 1)) *(float)(window_width / window_height),
-			cosf(XM_2PI / shape_size * (i + 1)),
+			radius * sinf(XM_2PI / shape_size * (i + 1)) *(float)(window_width / window_height),
+			radius * cosf(XM_2PI / shape_size * (i + 1)),
 			0.f,
 		};
 	}
@@ -283,10 +213,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		nullptr,
 		IID_PPV_ARGS(&verBuff)
 	);
+	assert(result == S_OK);
 
 	//Get VirtualMemory
 	XMFLOAT3 *vertMap = nullptr;
 	result = verBuff->Map(0, nullptr, (void **)&vertMap);
+	assert(result == S_OK);
+
 	std::copy(std::begin(vertices), std::end(vertices), vertMap);
 	for (auto i = 0; i < _countof(vertices); ++i) {
 		vertMap[i] = vertices[i];
@@ -303,11 +236,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma endregion
 
 #pragma region Index buffer
-	unsigned short indices[shape_size * 3] = {
-		0, 1, 3,
-		1, 2, 3,
-		2, 0, 3,
-	};
+	unsigned short indices[shape_size * 3];
+
+	for (int i = 0; i < shape_size; ++i) {
+		indices[i * 3]			= i;
+		indices[(i * 3) + 1]	= i + 1;
+		indices[(i * 3) + 2]	= shape_size;
+	}
+	indices[(shape_size * 3) - 3]	= shape_size - 1;
+	indices[(shape_size * 3) - 2]	= 0;
+	indices[(shape_size * 3) - 1]	= shape_size;
 
 	//Add index buffer
 	ID3D12Resource *indexBuff = nullptr;
@@ -320,10 +258,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		nullptr,
 		IID_PPV_ARGS(&indexBuff)
 	);
+	assert(result == S_OK);
 
 	//Get virtual memory
 	unsigned short *indexMap = nullptr;
 	result = indexBuff->Map(0, nullptr, (void **)&indexMap);
+	assert(result == S_OK);
 	for (int i = 0; i < _countof(indices); ++i) {
 		indexMap[i] = indices[i];
 	}
@@ -350,6 +290,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		0,
 		&vsBlob, &errorBlob
 	);
+	assert(result == S_OK);
 
 	result = D3DCompileFromFile(
 		L"BasicPS.hlsl",
@@ -360,6 +301,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		0,
 		&psBlob, &errorBlob
 	);
+	assert(result == S_OK);
 #pragma endregion
 
 	//ErrorMsg
@@ -437,7 +379,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	ID3DBlob *rootSigBlob = nullptr;
 	result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
+	assert(result == S_OK);
+
 	result = dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
+	assert(result == S_OK);
+
 	rootSigBlob->Release();
 
 	//set signature
@@ -445,8 +391,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	ID3D12PipelineState *pipelinestate = nullptr;
 	result = dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
+	assert(result == S_OK);
 
 #pragma endregion
+
+	//Input Initialize
+	Input input(w, hwnd);
 
 	while (true)
 	{
@@ -458,21 +408,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		if (msg.message == WM_QUIT) {
 			break;
 		}
-#pragma region Get IO status
-		//Get
-		result = devkeybord->Acquire();
 
-		//Get all key input status
-		BYTE key[256] = {};
-		result = devkeybord->GetDeviceState(sizeof(key), key);
-
-#ifdef _DEBUG
-		if (key[DIK_0]) {
-			OutputDebugStringA("Hit 0\n");
+		//Update
+		input.Update();
+		if (input.GetKeyDown(DIK_W)) {
+			OutputDebugStringA("(*'¤')");
 		}
-#endif // _DEBUG
-
-#pragma endregion
 
 #pragma region Frame process
 		//Get buck buffer number
@@ -492,7 +433,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//Display clear
 		//Change clear color if space key is pressed
-		if (key[DIK_SPACE]) {
+		if (input.GetKeyDown(DIK_SPACE)) {
 			float clearColor[] = { .5f, 1.f, .5f, .0f };
 			cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 		}
@@ -501,16 +442,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 		}
 
-		//Move object if arrow right key pressed
-		/*if (key[DIK_RIGHT]) {
-			vertices[0].x += .1f;
-			vertices[1].x += .1f;
-			vertices[2].x += .1f;
-		}*/
-
 		//Get VirtualMemory
 		XMFLOAT3 *vertMap = nullptr;
 		result = verBuff->Map(0, nullptr, (void **)&vertMap);
+		assert(result == S_OK);
+
 		std::copy(std::begin(vertices), std::end(vertices), vertMap);
 		verBuff->Unmap(0, nullptr);
 #pragma endregion
