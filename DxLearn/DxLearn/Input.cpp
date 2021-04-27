@@ -58,16 +58,10 @@ bool Input::GetKey(const int KeyCode)
 
 bool Input::GetKeyDown(const int KeyCode)
 {
-	if (!(old_Key[KeyCode]) && latest_Key[KeyCode]) {
-		return true;
-	}
-	return false;
+	return !(old_Key[KeyCode]) && latest_Key[KeyCode];
 }
 
 bool Input::GetKeyUp(const int KeyCode)
 {
-	if (old_Key[KeyCode] && !(latest_Key[KeyCode])) {
-		return true;
-	}
-	return false;
+	return old_Key[KeyCode] && !(latest_Key[KeyCode]);
 }

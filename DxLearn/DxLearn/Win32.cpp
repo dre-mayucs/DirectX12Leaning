@@ -1,6 +1,5 @@
 #include <Windows.h>
-
-#include "Win32_Initialize.h"
+#include "Win32.h"
 
 LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -12,13 +11,14 @@ LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void Win32_Initialize::Win32_Initialize_Conponents(WNDCLASSEX &w, HWND &hwnd)
+Win32::Win32(const wchar_t *DisplayName, const unsigned int DisplaySize_X, const unsigned int DisplaySize_Y) : 
+	DisplayName(DisplayName),
+	DisplaySize_X(DisplaySize_X),
+	DisplaySize_Y(DisplaySize_Y)
 {
-	OutputDebugStringA("Hello,DirectX!!\n");
-
 	w.cbSize = sizeof(WNDCLASSEX);
 	w.lpfnWndProc = (WNDPROC)WindowProc;
-	w.lpszClassName = L"DirectXGame";
+	w.lpszClassName = DisplayName;
 	w.hInstance = GetModuleHandle(nullptr);
 	w.hCursor = LoadCursor(NULL, IDC_ARROW);
 
@@ -26,12 +26,12 @@ void Win32_Initialize::Win32_Initialize_Conponents(WNDCLASSEX &w, HWND &hwnd)
 	RegisterClassEx(&w);
 
 	//Window Size
-	RECT wrc = { 0, 0, window_width, window_height };
+	RECT wrc = { 0, 0, DisplaySize_X, DisplaySize_Y };
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 	hwnd = CreateWindow(
 		w.lpszClassName,		//Class name
-		L"DirectXGame",			//Title bar
+		DisplayName,			//Title bar
 		WS_OVERLAPPEDWINDOW,	//Window type
 		CW_USEDEFAULT,			//Window position
 		CW_USEDEFAULT,			//Window position

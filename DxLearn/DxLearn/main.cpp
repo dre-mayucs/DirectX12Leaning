@@ -18,22 +18,23 @@
 //Utility
 #include <dinput.h>
 #include "Input.h"
-#include "Win32_Initialize.h"
+#include "Win32.h"
 
-const int window_width = 1280;
-const int window_height = 720;
+const int window_width = 1000;
+const int window_height = 1000;
 
 //namespace
 using namespace DirectX;
 
+struct ConstBufferData
+{
+	XMFLOAT4 color;
+};
+
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) 
 {
-	WNDCLASSEX w{};
-	MSG msg{};
-	HWND hwnd;
-
-	Win32_Initialize win32_init;
-	win32_init.Win32_Initialize_Conponents(w, hwnd);
+	//Win32initialize
+	Win32 win32(L"Test", 1000, 1000);
 
 #pragma region DirectX12 Initialize components
 	HRESULT result;
@@ -121,8 +122,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//Swap chain
 	DXGI_SWAP_CHAIN_DESC1 swapchainDesc{};
-	swapchainDesc.Width = 1280;
-	swapchainDesc.Height = 720;
+	swapchainDesc.Width = window_width;
+	swapchainDesc.Height = window_height;
 	swapchainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapchainDesc.SampleDesc.Count = 1;
 	swapchainDesc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
@@ -132,7 +133,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	dxgiFactory->CreateSwapChainForHwnd(
 		cmdQueue,
-		hwnd,
+		win32.hwnd,
 		&swapchainDesc,
 		nullptr,
 		nullptr,
@@ -170,13 +171,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 #pragma region Initialize drawing command
 
-#pragma region Top buffer
-	const unsigned int shape_size = 5;
+#pragma region Vertex buffer
+	const unsigned int shape_size = 64;
 	float radius = 0.2f;
 	XMFLOAT3 vertices[shape_size + 1];
 	for (auto i = 0; i < _countof(vertices) - 1; ++i) {
 		vertices[i] = {
-			radius * sinf(XM_2PI / shape_size * (i + 1)) *(float)(window_width / window_height),
+			radius * sinf(XM_2PI / shape_size * (i + 1)) * (window_width / window_height),
 			radius * cosf(XM_2PI / shape_size * (i + 1)),
 			0.f,
 		};
@@ -185,7 +186,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	UINT sizeVB = static_cast<UINT>(sizeof(XMFLOAT3) * _countof(vertices));
 
-	//Top buffer setting
+	//Set top buffer
 	D3D12_HEAP_PROPERTIES heapprop{};
 	heapprop.Type = D3D12_HEAP_TYPE_UPLOAD;	//Transfer to GPU
 	heapprop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -203,7 +204,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	resdesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 	resdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-	//Genelate top buffer
+	//Create top buffer
 	ID3D12Resource *verBuff = nullptr;
 	result = dev->CreateCommittedResource(
 		&heapprop,
@@ -304,6 +305,50 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	assert(result == S_OK);
 #pragma endregion
 
+#pragma region const buffer
+	//Heap
+	D3D12_HEAP_PROPERTIES cbheapprop{};
+	cbheapprop.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+	//Resources
+	D3D12_RESOURCE_DESC cbresdesc{};
+	cbresdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	cbresdesc.Width = (sizeof(ConstBufferData) + 0xff) & ~0xff;
+	cbresdesc.Height = 1;
+	cbresdesc.DepthOrArraySize = 1;
+	cbresdesc.MipLevels = 1;
+	cbresdesc.SampleDesc.Count = 1;
+	cbresdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	//Create
+	ID3D12Resource *constBuff = nullptr;
+	result = dev->CreateCommittedResource(
+		&cbheapprop,
+		D3D12_HEAP_FLAG_NONE,
+		&cbresdesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&constBuff)
+	);
+	assert(result == S_OK);
+
+	//Descripter heap
+	ID3D12DescriptorHeap *basicDescHeap = nullptr;
+	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc{};
+	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	descHeapDesc.NumDescriptors = 1;
+
+	result = dev->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&basicDescHeap));
+	assert(result == S_OK);
+
+	//Create const buffer
+	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc{};
+	cbvDesc.BufferLocation = constBuff->GetGPUVirtualAddress();
+	cbvDesc.SizeInBytes = (UINT)constBuff->GetDesc().Width;
+	dev->CreateConstantBufferView(&cbvDesc, basicDescHeap->GetCPUDescriptorHandleForHeapStart());
+#pragma endregion
+
 	//ErrorMsg
 	if (FAILED(result)) {
 		std::string errstr;
@@ -355,7 +400,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	blenddesc.BlendEnable = true;
 	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
-	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+	blenddesc.DestBlendAlpha = D3D12_BLEND_ONE;
 
 	//Alpha blend
 	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
@@ -372,10 +417,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	gpipeline.SampleDesc.Count = 1;
 
+	//root parameter
+	D3D12_DESCRIPTOR_RANGE descTblrange{};
+	descTblrange.NumDescriptors = 1;
+	descTblrange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+	descTblrange.BaseShaderRegister = 0;
+	descTblrange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	//setting root parameter
+	D3D12_ROOT_PARAMETER rootparam = {};
+	rootparam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootparam.DescriptorTable.pDescriptorRanges = &descTblrange;
+	rootparam.DescriptorTable.NumDescriptorRanges = 1;
+	rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
 	//root signeture
 	ID3D12RootSignature *rootsignature;
 	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	rootSignatureDesc.pParameters = &rootparam;
+	rootSignatureDesc.NumParameters = 1;
 
 	ID3DBlob *rootSigBlob = nullptr;
 	result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
@@ -396,26 +457,47 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma endregion
 
 	//Input Initialize
-	Input input(w, hwnd);
+	Input input(win32.w, win32.hwnd);
 
 	while (true)
 	{
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+#pragma region Frame process
+		if (PeekMessage(&win32.msg, nullptr, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&win32.msg);
+			DispatchMessage(&win32.msg);
 		}
 
-		if (msg.message == WM_QUIT) {
+		if (win32.msg.message == WM_QUIT) {
 			break;
 		}
 
 		//Update
 		input.Update();
-		if (input.GetKeyDown(DIK_W)) {
-			OutputDebugStringA("(*'¤')");
+
+		//trans
+		float speed = .01f;
+
+		if (input.GetKey(DIK_W)) {
+			for (auto &verData : vertices) {
+				verData.y += speed;
+			}
+		}
+		if (input.GetKey(DIK_S)) {
+			for (auto &verData : vertices) {
+				verData.y -= speed;
+			}
+		}
+		if (input.GetKey(DIK_A)) {
+			for (auto &verData : vertices) {
+				verData.x -= speed;
+			}
+		}
+		if (input.GetKey(DIK_D)) {
+			for (auto &verData : vertices) {
+				verData.x += speed;
+			}
 		}
 
-#pragma region Frame process
 		//Get buck buffer number
 		UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
 
@@ -432,29 +514,45 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		cmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
 
 		//Display clear
-		//Change clear color if space key is pressed
-		if (input.GetKeyDown(DIK_SPACE)) {
-			float clearColor[] = { .5f, 1.f, .5f, .0f };
-			cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
-		}
-		else {
-			float clearColor[] = { .3f, .3f, .3f, .0f };
-			cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
-		}
+		float clearColor[] = { .5f, .7f, .3f, 1.f };
+		cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 
 		//Get VirtualMemory
 		XMFLOAT3 *vertMap = nullptr;
 		result = verBuff->Map(0, nullptr, (void **)&vertMap);
 		assert(result == S_OK);
 
+		//Update point
 		std::copy(std::begin(vertices), std::end(vertices), vertMap);
 		verBuff->Unmap(0, nullptr);
+
+		//Initialize const buffer
+		XMFLOAT4 colorCache;
+		if (input.GetKey(DIK_SPACE)) {
+			colorCache = { 0.f, 0.f, 0.f, .5f };
+		}
+		else {
+			colorCache = { 0.f, 0.f, 0.f, 1.f };
+		}
+
+		ConstBufferData *constMap = nullptr;
+		result = constBuff->Map(0, nullptr, (void **)&constMap);
+		constMap->color = colorCache;
+		constBuff->Unmap(0, nullptr);
+		assert(result == S_OK);
 #pragma endregion
 
 #pragma region Draw command
 		//pipeline
 		cmdList->SetPipelineState(pipelinestate);
 		cmdList->SetGraphicsRootSignature(rootsignature);
+
+		//Set Descriptor heap
+		ID3D12DescriptorHeap *ppHeaps[] = { basicDescHeap };
+		cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
+		//Set constant buffer view
+		cmdList->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
 
 		//viewport setting
 		D3D12_VIEWPORT viewport{};
@@ -482,7 +580,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//Index buffer set command
 		cmdList->IASetIndexBuffer(&ibView);
 		cmdList->DrawIndexedInstanced((int)_countof(indices), 1, 0, 0, 0);
-#pragma endregion
 
 		//Restore Resource barrier setting(writing inhibition)
 		barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -509,6 +606,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		cmdAllocator->Reset();
 		cmdList->Reset(cmdAllocator, nullptr);
 		swapchain->Present(1, 0);
+#pragma endregion
 	}
 
 	return 0;
