@@ -186,7 +186,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	UINT sizeVB = static_cast<UINT>(sizeof(XMFLOAT3) * _countof(vertices));
 
-	//Set top buffer
+	//Set vertex buffer
 	D3D12_HEAP_PROPERTIES heapprop{};
 	heapprop.Type = D3D12_HEAP_TYPE_UPLOAD;	//Transfer to GPU
 	heapprop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
