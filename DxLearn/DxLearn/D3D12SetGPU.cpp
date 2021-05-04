@@ -58,7 +58,6 @@ HRESULT D3D12SetGPU::D3D12FeatureLv()
 	assert(result == S_OK);
 
 	return result;
-	return result;
 }
 
 
