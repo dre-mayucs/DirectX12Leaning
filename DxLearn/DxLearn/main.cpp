@@ -19,6 +19,8 @@
 #include <dinput.h>
 #include "Input.h"
 #include "Win32.h"
+#include "tempUtility.h"
+#include "D3D12SetGPU.h"
 
 const int window_width = 1000;
 const int window_height = 1000;
@@ -26,20 +28,13 @@ const int window_height = 1000;
 //namespace
 using namespace DirectX;
 
-struct ConstBufferData
-{
-	XMFLOAT4 color;
-};
-
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) 
+int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) 
 {
 	//Win32initialize
 	Win32 win32(L"Test", 1000, 1000);
 
 #pragma region DirectX12 Initialize components
 	HRESULT result;
-	ID3D12Device *dev = nullptr;
-	IDXGIFactory6 *dxgiFactory = nullptr;
 	IDXGISwapChain4 *swapchain = nullptr;
 
 	ID3D12CommandAllocator *cmdAllocator = nullptr;
@@ -47,66 +42,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ID3D12CommandQueue *cmdQueue = nullptr;
 	ID3D12DescriptorHeap *rtvHeaps = nullptr;
 
-	//Graphics adapter
-	result = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
-	assert(result == S_OK);
-
-	std::vector<IDXGIAdapter1 *> adapters;
-	IDXGIAdapter1 *tmpAdapter = nullptr;
-
-	//Listup GPU
-	for (auto i = 0; dxgiFactory->EnumAdapters1(i, &tmpAdapter) != DXGI_ERROR_NOT_FOUND; ++i) {
-		adapters.push_back(tmpAdapter);
-	}
-
-	//Select GPU
-	for (auto i = 0; i < adapters.size(); ++i) {
-		DXGI_ADAPTER_DESC1 adesc;
-		adapters[i]->GetDesc1(&adesc);
-
-		//throw software GPU
-		if (adesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
-			continue;
-		}
-
-		std::wstring strDesc = adesc.Description;
-
-		//Negative keywords
-		if (strDesc.find(L"Intel") == std::wstring::npos) {
-			tmpAdapter = adapters[i];
-			break;
-		}
-	}
-
-	//Feature level
-	D3D_FEATURE_LEVEL featurelevel;
-	D3D_FEATURE_LEVEL levels[] = {
-		D3D_FEATURE_LEVEL_12_1,
-		D3D_FEATURE_LEVEL_12_0,
-		D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0
-	};
-
-	for (auto i = 0; i < _countof(levels); ++i) {
-		result = D3D12CreateDevice(tmpAdapter, levels[i], IID_PPV_ARGS(&dev));
-		assert(result == S_OK);
-
-		if (result == S_OK) {
-			featurelevel = levels[i];
-			break;
-		}
-	}
-	assert(result == S_OK);
+	D3D12SetGPU GPU;
+	GPU.D3D12ListUpGPU();
+	GPU.D3D12SelectGPU();
+	GPU.D3D12FeatureLv();
 
 	//Create allocater
-	result = dev->CreateCommandAllocator(
+	result = GPU.dev->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		IID_PPV_ARGS(&cmdAllocator)
 	);
 	assert(result == S_OK);
 
 	//Create commandlist
-	result = dev->CreateCommandList(
+	result = GPU.dev->CreateCommandList(
 		0,
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		cmdAllocator,
@@ -117,7 +66,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//Command queue
 	D3D12_COMMAND_QUEUE_DESC cmdQueueDesc{};
-	result = dev->CreateCommandQueue(&cmdQueueDesc, IID_PPV_ARGS(&cmdQueue));
+	result = GPU.dev->CreateCommandQueue(&cmdQueueDesc, IID_PPV_ARGS(&cmdQueue));
 	assert(result == S_OK);
 
 	//Swap chain
@@ -131,7 +80,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-	dxgiFactory->CreateSwapChainForHwnd(
+	GPU.dxgiFactory->CreateSwapChainForHwnd(
 		cmdQueue,
 		win32.hwnd,
 		&swapchainDesc,
@@ -145,7 +94,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	//Front and Back screen layer
 	heapDesc.NumDescriptors = 2;
-	dev->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rtvHeaps));
+	GPU.dev->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rtvHeaps));
 
 	//target view
 	std::vector<ID3D12Resource *> backBuffers(2);
@@ -154,8 +103,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		assert(result == S_OK);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
-		handle.ptr += i * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
-		dev->CreateRenderTargetView(
+		handle.ptr += i * GPU.dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
+		GPU.dev->CreateRenderTargetView(
 			backBuffers[i],
 			nullptr,
 			handle
@@ -165,7 +114,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//Generate Fence
 	ID3D12Fence *fence = nullptr;
 	UINT64 fenceVal = 0;
-	result = dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	result = GPU.dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(result == S_OK);
 #pragma endregion
 
@@ -206,7 +155,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//Create top buffer
 	ID3D12Resource *verBuff = nullptr;
-	result = dev->CreateCommittedResource(
+	result = GPU.dev->CreateCommittedResource(
 		&heapprop,
 		D3D12_HEAP_FLAG_NONE,
 		&resdesc,
@@ -251,7 +200,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//Add index buffer
 	ID3D12Resource *indexBuff = nullptr;
 	resdesc.Width = sizeof(indices);
-	result = dev->CreateCommittedResource(
+	result = GPU.dev->CreateCommittedResource(
 		&heapprop,
 		D3D12_HEAP_FLAG_NONE,
 		&resdesc,
@@ -322,7 +271,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//Create
 	ID3D12Resource *constBuff = nullptr;
-	result = dev->CreateCommittedResource(
+	result = GPU.dev->CreateCommittedResource(
 		&cbheapprop,
 		D3D12_HEAP_FLAG_NONE,
 		&cbresdesc,
@@ -339,14 +288,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	descHeapDesc.NumDescriptors = 1;
 
-	result = dev->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&basicDescHeap));
+	result = GPU.dev->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&basicDescHeap));
 	assert(result == S_OK);
 
 	//Create const buffer
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc{};
 	cbvDesc.BufferLocation = constBuff->GetGPUVirtualAddress();
 	cbvDesc.SizeInBytes = (UINT)constBuff->GetDesc().Width;
-	dev->CreateConstantBufferView(&cbvDesc, basicDescHeap->GetCPUDescriptorHandleForHeapStart());
+	GPU.dev->CreateConstantBufferView(&cbvDesc, basicDescHeap->GetCPUDescriptorHandleForHeapStart());
 #pragma endregion
 
 	//ErrorMsg
@@ -442,7 +391,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
 	assert(result == S_OK);
 
-	result = dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
+	result = GPU.dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
 	assert(result == S_OK);
 
 	rootSigBlob->Release();
@@ -451,7 +400,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	gpipeline.pRootSignature = rootsignature;
 
 	ID3D12PipelineState *pipelinestate = nullptr;
-	result = dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
+	result = GPU.dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
 	assert(result == S_OK);
 
 #pragma endregion
@@ -478,6 +427,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		float speed = .01f;
 
 		if (input.GetKey(DIK_W)) {
+			gpipeline.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 			for (auto &verData : vertices) {
 				verData.y += speed;
 			}
@@ -510,7 +460,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//Get Render target view discriper heap handle
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvH = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
-		rtvH.ptr += bbIndex * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
+		rtvH.ptr += bbIndex * GPU.dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
 		cmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
 
 		//Display clear
@@ -568,9 +518,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//Set scissorrect
 		D3D12_RECT scissorrect{};
-		scissorrect.left = 0.f;
+		scissorrect.left = 0L;
 		scissorrect.right = scissorrect.left + window_width;
-		scissorrect.top = 0.f;
+		scissorrect.top = 0L;
 		scissorrect.bottom = scissorrect.top + window_height;
 
 		cmdList->RSSetScissorRects(1, &scissorrect);
@@ -598,8 +548,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		if (fence->GetCompletedValue() != fenceVal) {
 			HANDLE event = CreateEvent(nullptr, false, false, nullptr);
 			fence->SetEventOnCompletion(fenceVal, event);
-			WaitForSingleObject(event, INFINITE);
-			CloseHandle(event);
+
+			if (event != 0) {
+				WaitForSingleObject(event, INFINITE);
+				CloseHandle(event);
+			}
 		}
 
 		//Change display
