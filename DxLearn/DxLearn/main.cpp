@@ -8,44 +8,17 @@ using namespace DirectX;
 
 int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) 
 {
-	//Win32initialize
-	Win32 win32(L"Test", 1000, 1000);
-
-#pragma region DirectX12 Initialize components
 	HRESULT result;
-	ID3D12DescriptorHeap *rtvHeaps = nullptr;
 
+	//Initialize Win32
+	Win32 win32(L"Test", window_width, window_height);
+
+	//Initialize DirectX12
 	DirectX12 dx12(win32.hwnd, window_width, window_height);
 	dx12.Initialize_components();
 
-	//Descriptor heap
-	D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
-	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-	//Front and Back screen layer
-	heapDesc.NumDescriptors = 2;
-	dx12.dev->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rtvHeaps));
-
-	//target view
-	std::vector<ID3D12Resource *> backBuffers(2);
-	for (auto i = 0; i < 2; ++i) {
-		result = dx12.swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
-		assert(result == S_OK);
-
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
-		handle.ptr += i * dx12.dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
-		dx12.dev->CreateRenderTargetView(
-			backBuffers[i],
-			nullptr,
-			handle
-		);
-	}
-
-	//Generate Fence
-	ID3D12Fence *fence = nullptr;
-	UINT64 fenceVal = 0;
-	result = dx12.dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-	assert(result == S_OK);
-#pragma endregion
+	//Initialize IO
+	Input input(win32.w, win32.hwnd);
 
 #pragma region Initialize drawing command
 
@@ -334,29 +307,16 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 #pragma endregion
 
-	//Input Initialize
-	Input input(win32.w, win32.hwnd);
+	float speed = .01f;
 
 	while (true)
 	{
 #pragma region Frame process
-		if (PeekMessage(&win32.msg, nullptr, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&win32.msg);
-			DispatchMessage(&win32.msg);
-		}
-
-		if (win32.msg.message == WM_QUIT) {
-			break;
-		}
-
-		//Update
+		dx12.ClearDrawScreen(dx12.GetColor(100, 200, 255, 255));
 		input.Update();
 
-		//trans
-		float speed = .01f;
-
+#pragma region Operation
 		if (input.GetKey(DIK_W)) {
-			gpipeline.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 			for (auto &verData : vertices) {
 				verData.y += speed;
 			}
@@ -376,25 +336,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 				verData.x += speed;
 			}
 		}
-
-		//Get buck buffer number
-		UINT bbIndex = dx12.swapchain->GetCurrentBackBufferIndex();
-
-		//Resources barrier(change OP)
-		D3D12_RESOURCE_BARRIER barrierDesc{};
-		barrierDesc.Transition.pResource = backBuffers[bbIndex];
-		barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;		//view
-		barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;	//draw
-		dx12.cmdList->ResourceBarrier(1, &barrierDesc);
-
-		//Get Render target view discriper heap handle
-		D3D12_CPU_DESCRIPTOR_HANDLE rtvH = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
-		rtvH.ptr += bbIndex * dx12.dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
-		dx12.cmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
-
-		//Display clear
-		float clearColor[] = { .5f, .7f, .3f, 1.f };
-		dx12.cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
+#pragma endregion
 
 		//Get VirtualMemory
 		XMFLOAT3 *vertMap = nullptr;
@@ -406,17 +348,9 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		verBuff->Unmap(0, nullptr);
 
 		//Initialize const buffer
-		XMFLOAT4 colorCache;
-		if (input.GetKey(DIK_SPACE)) {
-			colorCache = { 0.f, 0.f, 0.f, .5f };
-		}
-		else {
-			colorCache = { 0.f, 0.f, 0.f, 1.f };
-		}
-
 		ConstBufferData *constMap = nullptr;
 		result = constBuff->Map(0, nullptr, (void **)&constMap);
-		constMap->color = colorCache;
+		constMap->color = input.GetKey(DIK_SPACE) ? dx12.GetColor(0, 0, 0, 100) : dx12.GetColor(0, 0, 0, 255);
 		constBuff->Unmap(0, nullptr);
 		assert(result == S_OK);
 #pragma endregion
@@ -461,35 +395,15 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		dx12.cmdList->DrawIndexedInstanced((int)_countof(indices), 1, 0, 0, 0);
 
 		//Restore Resource barrier setting(writing inhibition)
-		barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-		dx12.cmdList->ResourceBarrier(1, &barrierDesc);
-
-		//Close command
-		dx12.cmdList->Close();
-
-		//Run commandlist
-		ID3D12CommandList *cmdLists[] = { dx12.cmdList };
-		dx12.cmdQueue->ExecuteCommandLists(1, cmdLists);
-
-		//awaiting run commandlist
-		dx12.cmdQueue->Signal(fence, ++fenceVal);
-		if (fence->GetCompletedValue() != fenceVal) {
-			HANDLE event = CreateEvent(nullptr, false, false, nullptr);
-			fence->SetEventOnCompletion(fenceVal, event);
-
-			if (event != 0) {
-				WaitForSingleObject(event, INFINITE);
-				CloseHandle(event);
-			}
-		}
+		dx12.barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		dx12.barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+		dx12.cmdList->ResourceBarrier(1, &dx12.barrierDesc);
 
 		//Change display
-		dx12.cmdAllocator->Reset();
-		dx12.cmdList->Reset(dx12.cmdAllocator, nullptr);
-		dx12.swapchain->Present(1, 0);
+		dx12.ScreenFlip();
+		if (!win32.ProcessMessage()) { break; }
+		if (input.GetKeyDown(DIK_ESCAPE)) { break; }
 #pragma endregion
 	}
-
 	return 0;
 }

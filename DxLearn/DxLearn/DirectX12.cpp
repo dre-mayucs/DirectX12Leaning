@@ -16,9 +16,6 @@
 #include <assert.h>
 
 //Utility
-#include <dinput.h>
-#include "Input.h"
-#include "Win32.h"
 #include "tempUtility.h"
 
 //this me
@@ -43,6 +40,16 @@ DirectX12::DirectX12(HWND hwnd, const int window_width, const int window_height)
 	//Swapchain
 	swapchain		= nullptr;
 	swapchainDesc	= {};
+
+	//Heap
+	heapDesc		= {};
+
+	//Fence
+	fence			= nullptr;
+	fenceVal		= 0;
+
+	//Draw
+	barrierDesc		= {};
 }
 
 void DirectX12::Initialize_components()
@@ -58,8 +65,71 @@ void DirectX12::Initialize_components()
 	D3D12CreateCommandQueueDescription();
 
 	//Swap chain
-	D3D12CreateSwapchainDescription();
+	D3D12SetSwapchainDescription();
+
+	//Heap
+	D3D12SetDescripterHeap();
+
+	//Target veiw
+	D3D12SetTargetView();
+
+	//Fence
+	D3D12CreateFence();
 }
+
+#pragma region Draw
+DirectX::XMFLOAT4 DirectX12::GetColor(const float R, const float G, const float B, const float A)
+{
+	return DirectX::XMFLOAT4(R / 255, G / 255, B / 255, A / 255);
+}
+
+void DirectX12::ClearDrawScreen(const DirectX::XMFLOAT4 color)
+{
+	//Get buck buffer number
+	UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
+
+	//Resources barrier(change OP)
+	barrierDesc.Transition.pResource = backBuffers[bbIndex];
+	barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;		//view
+	barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;	//draw
+	cmdList->ResourceBarrier(1, &barrierDesc);
+
+	//Get Render target view discriper heap handle
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvH = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
+	rtvH.ptr += bbIndex * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
+	cmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
+
+	//Display clear
+	float clearColor[] = { color.x, color.y, color.z, color.w };
+	cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
+}
+
+void DirectX12::ScreenFlip()
+{
+	//Close command
+	cmdList->Close();
+
+	//Run commandlist
+	ID3D12CommandList *cmdLists[] = { cmdList };
+	cmdQueue->ExecuteCommandLists(1, cmdLists);
+
+	//awaiting run commandlist
+	cmdQueue->Signal(fence, ++fenceVal);
+	if (fence->GetCompletedValue() != fenceVal) {
+		HANDLE event = CreateEvent(nullptr, false, false, nullptr);
+		fence->SetEventOnCompletion(fenceVal, event);
+
+		if (event != 0) {
+			WaitForSingleObject(event, INFINITE);
+			CloseHandle(event);
+		}
+	}
+
+	cmdAllocator->Reset();
+	cmdList->Reset(cmdAllocator, nullptr);
+	swapchain->Present(1, 0);
+}
+#pragma endregion
 
 #pragma region GPU
 void DirectX12::D3D12ListUpGPU()
@@ -143,7 +213,7 @@ HRESULT DirectX12::D3D12CreateCommandQueueDescription()
 #pragma endregion
 
 #pragma region Swapchain
-void DirectX12::D3D12CreateSwapchainDescription()
+void DirectX12::D3D12SetSwapchainDescription()
 {
 	swapchainDesc.Width = window_width;
 	swapchainDesc.Height = window_height;
@@ -162,5 +232,44 @@ void DirectX12::D3D12CreateSwapchainDescription()
 		nullptr,
 		(IDXGISwapChain1 **)&swapchain
 	);
+}
+#pragma endregion
+
+#pragma region Heap
+void DirectX12::D3D12SetDescripterHeap()
+{
+	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+
+	//Front and Back screen layer
+	heapDesc.NumDescriptors = 2;
+	dev->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rtvHeaps));
+}
+#pragma endregion
+
+#pragma region Target view
+void DirectX12::D3D12SetTargetView()
+{
+	//target view
+	for (auto i = 0; i < 2; ++i) {
+		result = swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
+		assert(result == S_OK);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
+		handle.ptr += i * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
+		dev->CreateRenderTargetView(
+			backBuffers[i],
+			nullptr,
+			handle
+		);
+	}
+}
+#pragma endregion
+
+#pragma region Fence
+void DirectX12::D3D12CreateFence()
+{
+	//Generate Fence
+	result = dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	assert(result == S_OK);
 }
 #pragma endregion

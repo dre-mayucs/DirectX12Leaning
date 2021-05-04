@@ -46,3 +46,13 @@ Win32::Win32(const wchar_t *DisplayName, const unsigned int DisplaySize_X, const
 	//View window
 	ShowWindow(hwnd, SW_SHOW);
 }
+
+bool Win32::ProcessMessage()
+{
+	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	return !(msg.message == WM_QUIT);
+}
