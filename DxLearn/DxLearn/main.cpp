@@ -1,26 +1,4 @@
-//API(Win)
-#include <Windows.h>
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <DirectXMath.h>
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-
-//shader(HLSL)
-#include <d3dcompiler.h>
-#pragma comment(lib, "d3dcompiler.lib")
-
-//STL
-#include <vector>
-#include <string>
-#include <assert.h>
-
-//Utility
-#include <dinput.h>
-#include "Input.h"
-#include "Win32.h"
-#include "tempUtility.h"
-#include "D3D12SetGPU.h"
+#include "includes.h"
 
 const int window_width = 1000;
 const int window_height = 1000;
@@ -36,10 +14,6 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 #pragma region DirectX12 Initialize components
 	HRESULT result;
 	IDXGISwapChain4 *swapchain = nullptr;
-
-	ID3D12CommandAllocator *cmdAllocator = nullptr;
-	ID3D12GraphicsCommandList *cmdList = nullptr;
-	ID3D12CommandQueue *cmdQueue = nullptr;
 	ID3D12DescriptorHeap *rtvHeaps = nullptr;
 
 	D3D12SetGPU GPU;
@@ -48,26 +22,10 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	GPU.D3D12FeatureLv();
 
 	//Create allocater
-	result = GPU.dev->CreateCommandAllocator(
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		IID_PPV_ARGS(&cmdAllocator)
-	);
-	assert(result == S_OK);
-
-	//Create commandlist
-	result = GPU.dev->CreateCommandList(
-		0,
-		D3D12_COMMAND_LIST_TYPE_DIRECT,
-		cmdAllocator,
-		nullptr,
-		IID_PPV_ARGS(&cmdList)
-	);
-	assert(result == S_OK);
-
-	//Command queue
-	D3D12_COMMAND_QUEUE_DESC cmdQueueDesc{};
-	result = GPU.dev->CreateCommandQueue(&cmdQueueDesc, IID_PPV_ARGS(&cmdQueue));
-	assert(result == S_OK);
+	D3D12Commands commands(GPU.dev);
+	commands.D3D12CreateCommandAllocator();
+	commands.D3D12CreateCommandList();
+	commands.D3D12CreateCommandQueueDescription();
 
 	//Swap chain
 	DXGI_SWAP_CHAIN_DESC1 swapchainDesc{};
@@ -81,7 +39,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	GPU.dxgiFactory->CreateSwapChainForHwnd(
-		cmdQueue,
+		commands.cmdQueue,
 		win32.hwnd,
 		&swapchainDesc,
 		nullptr,
@@ -456,16 +414,16 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		barrierDesc.Transition.pResource = backBuffers[bbIndex];
 		barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;		//view
 		barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;	//draw
-		cmdList->ResourceBarrier(1, &barrierDesc);
+		commands.cmdList->ResourceBarrier(1, &barrierDesc);
 
 		//Get Render target view discriper heap handle
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvH = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
 		rtvH.ptr += bbIndex * GPU.dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
-		cmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
+		commands.cmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
 
 		//Display clear
 		float clearColor[] = { .5f, .7f, .3f, 1.f };
-		cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
+		commands.cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 
 		//Get VirtualMemory
 		XMFLOAT3 *vertMap = nullptr;
@@ -494,15 +452,15 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 #pragma region Draw command
 		//pipeline
-		cmdList->SetPipelineState(pipelinestate);
-		cmdList->SetGraphicsRootSignature(rootsignature);
+		commands.cmdList->SetPipelineState(pipelinestate);
+		commands.cmdList->SetGraphicsRootSignature(rootsignature);
 
 		//Set Descriptor heap
 		ID3D12DescriptorHeap *ppHeaps[] = { basicDescHeap };
-		cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+		commands.cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 		//Set constant buffer view
-		cmdList->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
+		commands.cmdList->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
 
 		//viewport setting
 		D3D12_VIEWPORT viewport{};
@@ -514,7 +472,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		viewport.MinDepth = .0f;
 		viewport.MaxDepth = 1.f;
 
-		cmdList->RSSetViewports(1, &viewport);
+		commands.cmdList->RSSetViewports(1, &viewport);
 
 		//Set scissorrect
 		D3D12_RECT scissorrect{};
@@ -523,28 +481,28 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		scissorrect.top = 0L;
 		scissorrect.bottom = scissorrect.top + window_height;
 
-		cmdList->RSSetScissorRects(1, &scissorrect);
-		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		cmdList->IASetVertexBuffers(0, 1, &vbView);
+		commands.cmdList->RSSetScissorRects(1, &scissorrect);
+		commands.cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commands.cmdList->IASetVertexBuffers(0, 1, &vbView);
 
 		//Index buffer set command
-		cmdList->IASetIndexBuffer(&ibView);
-		cmdList->DrawIndexedInstanced((int)_countof(indices), 1, 0, 0, 0);
+		commands.cmdList->IASetIndexBuffer(&ibView);
+		commands.cmdList->DrawIndexedInstanced((int)_countof(indices), 1, 0, 0, 0);
 
 		//Restore Resource barrier setting(writing inhibition)
 		barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-		cmdList->ResourceBarrier(1, &barrierDesc);
+		commands.cmdList->ResourceBarrier(1, &barrierDesc);
 
 		//Close command
-		cmdList->Close();
+		commands.cmdList->Close();
 
 		//Run commandlist
-		ID3D12CommandList *cmdLists[] = { cmdList };
-		cmdQueue->ExecuteCommandLists(1, cmdLists);
+		ID3D12CommandList *cmdLists[] = { commands.cmdList };
+		commands.cmdQueue->ExecuteCommandLists(1, cmdLists);
 
 		//awaiting run commandlist
-		cmdQueue->Signal(fence, ++fenceVal);
+		commands.cmdQueue->Signal(fence, ++fenceVal);
 		if (fence->GetCompletedValue() != fenceVal) {
 			HANDLE event = CreateEvent(nullptr, false, false, nullptr);
 			fence->SetEventOnCompletion(fenceVal, event);
@@ -556,8 +514,8 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		}
 
 		//Change display
-		cmdAllocator->Reset();
-		cmdList->Reset(cmdAllocator, nullptr);
+		commands.cmdAllocator->Reset();
+		commands.cmdList->Reset(commands.cmdAllocator, nullptr);
 		swapchain->Present(1, 0);
 #pragma endregion
 	}
