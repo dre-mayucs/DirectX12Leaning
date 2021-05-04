@@ -13,56 +13,27 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 #pragma region DirectX12 Initialize components
 	HRESULT result;
-	IDXGISwapChain4 *swapchain = nullptr;
 	ID3D12DescriptorHeap *rtvHeaps = nullptr;
 
-	D3D12SetGPU GPU;
-	GPU.D3D12ListUpGPU();
-	GPU.D3D12SelectGPU();
-	GPU.D3D12FeatureLv();
-
-	//Create allocater
-	D3D12Commands commands(GPU.dev);
-	commands.D3D12CreateCommandAllocator();
-	commands.D3D12CreateCommandList();
-	commands.D3D12CreateCommandQueueDescription();
-
-	//Swap chain
-	DXGI_SWAP_CHAIN_DESC1 swapchainDesc{};
-	swapchainDesc.Width = window_width;
-	swapchainDesc.Height = window_height;
-	swapchainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	swapchainDesc.SampleDesc.Count = 1;
-	swapchainDesc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
-	swapchainDesc.BufferCount = 2;
-	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-	swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-
-	GPU.dxgiFactory->CreateSwapChainForHwnd(
-		commands.cmdQueue,
-		win32.hwnd,
-		&swapchainDesc,
-		nullptr,
-		nullptr,
-		(IDXGISwapChain1 **)&swapchain
-	);
+	DirectX12 dx12(win32.hwnd, window_width, window_height);
+	dx12.Initialize_components();
 
 	//Descriptor heap
 	D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
 	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	//Front and Back screen layer
 	heapDesc.NumDescriptors = 2;
-	GPU.dev->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rtvHeaps));
+	dx12.dev->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&rtvHeaps));
 
 	//target view
 	std::vector<ID3D12Resource *> backBuffers(2);
 	for (auto i = 0; i < 2; ++i) {
-		result = swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
+		result = dx12.swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
 		assert(result == S_OK);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
-		handle.ptr += i * GPU.dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
-		GPU.dev->CreateRenderTargetView(
+		handle.ptr += i * dx12.dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
+		dx12.dev->CreateRenderTargetView(
 			backBuffers[i],
 			nullptr,
 			handle
@@ -72,7 +43,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	//Generate Fence
 	ID3D12Fence *fence = nullptr;
 	UINT64 fenceVal = 0;
-	result = GPU.dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	result = dx12.dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 	assert(result == S_OK);
 #pragma endregion
 
@@ -113,7 +84,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	//Create top buffer
 	ID3D12Resource *verBuff = nullptr;
-	result = GPU.dev->CreateCommittedResource(
+	result = dx12.dev->CreateCommittedResource(
 		&heapprop,
 		D3D12_HEAP_FLAG_NONE,
 		&resdesc,
@@ -158,7 +129,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	//Add index buffer
 	ID3D12Resource *indexBuff = nullptr;
 	resdesc.Width = sizeof(indices);
-	result = GPU.dev->CreateCommittedResource(
+	result = dx12.dev->CreateCommittedResource(
 		&heapprop,
 		D3D12_HEAP_FLAG_NONE,
 		&resdesc,
@@ -229,7 +200,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	//Create
 	ID3D12Resource *constBuff = nullptr;
-	result = GPU.dev->CreateCommittedResource(
+	result = dx12.dev->CreateCommittedResource(
 		&cbheapprop,
 		D3D12_HEAP_FLAG_NONE,
 		&cbresdesc,
@@ -246,14 +217,14 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	descHeapDesc.NumDescriptors = 1;
 
-	result = GPU.dev->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&basicDescHeap));
+	result = dx12.dev->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&basicDescHeap));
 	assert(result == S_OK);
 
 	//Create const buffer
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc{};
 	cbvDesc.BufferLocation = constBuff->GetGPUVirtualAddress();
 	cbvDesc.SizeInBytes = (UINT)constBuff->GetDesc().Width;
-	GPU.dev->CreateConstantBufferView(&cbvDesc, basicDescHeap->GetCPUDescriptorHandleForHeapStart());
+	dx12.dev->CreateConstantBufferView(&cbvDesc, basicDescHeap->GetCPUDescriptorHandleForHeapStart());
 #pragma endregion
 
 	//ErrorMsg
@@ -349,7 +320,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
 	assert(result == S_OK);
 
-	result = GPU.dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
+	result = dx12.dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
 	assert(result == S_OK);
 
 	rootSigBlob->Release();
@@ -358,7 +329,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	gpipeline.pRootSignature = rootsignature;
 
 	ID3D12PipelineState *pipelinestate = nullptr;
-	result = GPU.dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
+	result = dx12.dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
 	assert(result == S_OK);
 
 #pragma endregion
@@ -407,23 +378,23 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		}
 
 		//Get buck buffer number
-		UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
+		UINT bbIndex = dx12.swapchain->GetCurrentBackBufferIndex();
 
 		//Resources barrier(change OP)
 		D3D12_RESOURCE_BARRIER barrierDesc{};
 		barrierDesc.Transition.pResource = backBuffers[bbIndex];
 		barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;		//view
 		barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;	//draw
-		commands.cmdList->ResourceBarrier(1, &barrierDesc);
+		dx12.cmdList->ResourceBarrier(1, &barrierDesc);
 
 		//Get Render target view discriper heap handle
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvH = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
-		rtvH.ptr += bbIndex * GPU.dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
-		commands.cmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
+		rtvH.ptr += bbIndex * dx12.dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
+		dx12.cmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
 
 		//Display clear
 		float clearColor[] = { .5f, .7f, .3f, 1.f };
-		commands.cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
+		dx12.cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 
 		//Get VirtualMemory
 		XMFLOAT3 *vertMap = nullptr;
@@ -452,15 +423,15 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 #pragma region Draw command
 		//pipeline
-		commands.cmdList->SetPipelineState(pipelinestate);
-		commands.cmdList->SetGraphicsRootSignature(rootsignature);
+		dx12.cmdList->SetPipelineState(pipelinestate);
+		dx12.cmdList->SetGraphicsRootSignature(rootsignature);
 
 		//Set Descriptor heap
 		ID3D12DescriptorHeap *ppHeaps[] = { basicDescHeap };
-		commands.cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+		dx12.cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 		//Set constant buffer view
-		commands.cmdList->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
+		dx12.cmdList->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
 
 		//viewport setting
 		D3D12_VIEWPORT viewport{};
@@ -472,7 +443,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		viewport.MinDepth = .0f;
 		viewport.MaxDepth = 1.f;
 
-		commands.cmdList->RSSetViewports(1, &viewport);
+		dx12.cmdList->RSSetViewports(1, &viewport);
 
 		//Set scissorrect
 		D3D12_RECT scissorrect{};
@@ -481,28 +452,28 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		scissorrect.top = 0L;
 		scissorrect.bottom = scissorrect.top + window_height;
 
-		commands.cmdList->RSSetScissorRects(1, &scissorrect);
-		commands.cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commands.cmdList->IASetVertexBuffers(0, 1, &vbView);
+		dx12.cmdList->RSSetScissorRects(1, &scissorrect);
+		dx12.cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dx12.cmdList->IASetVertexBuffers(0, 1, &vbView);
 
 		//Index buffer set command
-		commands.cmdList->IASetIndexBuffer(&ibView);
-		commands.cmdList->DrawIndexedInstanced((int)_countof(indices), 1, 0, 0, 0);
+		dx12.cmdList->IASetIndexBuffer(&ibView);
+		dx12.cmdList->DrawIndexedInstanced((int)_countof(indices), 1, 0, 0, 0);
 
 		//Restore Resource barrier setting(writing inhibition)
 		barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-		commands.cmdList->ResourceBarrier(1, &barrierDesc);
+		dx12.cmdList->ResourceBarrier(1, &barrierDesc);
 
 		//Close command
-		commands.cmdList->Close();
+		dx12.cmdList->Close();
 
 		//Run commandlist
-		ID3D12CommandList *cmdLists[] = { commands.cmdList };
-		commands.cmdQueue->ExecuteCommandLists(1, cmdLists);
+		ID3D12CommandList *cmdLists[] = { dx12.cmdList };
+		dx12.cmdQueue->ExecuteCommandLists(1, cmdLists);
 
 		//awaiting run commandlist
-		commands.cmdQueue->Signal(fence, ++fenceVal);
+		dx12.cmdQueue->Signal(fence, ++fenceVal);
 		if (fence->GetCompletedValue() != fenceVal) {
 			HANDLE event = CreateEvent(nullptr, false, false, nullptr);
 			fence->SetEventOnCompletion(fenceVal, event);
@@ -514,9 +485,9 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		}
 
 		//Change display
-		commands.cmdAllocator->Reset();
-		commands.cmdList->Reset(commands.cmdAllocator, nullptr);
-		swapchain->Present(1, 0);
+		dx12.cmdAllocator->Reset();
+		dx12.cmdList->Reset(dx12.cmdAllocator, nullptr);
+		dx12.swapchain->Present(1, 0);
 #pragma endregion
 	}
 

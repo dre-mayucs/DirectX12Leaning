@@ -22,5 +22,4 @@
 #include "Input.h"
 #include "Win32.h"
 #include "tempUtility.h"
-#include "D3D12SetGPU.h"
-#include "D3D12Commands.h"
+#include "DirectX12.h"
