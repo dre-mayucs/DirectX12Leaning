@@ -1,30 +1,89 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="DirectX">
+      <UniqueIdentifier>{8a06f941-1d53-466f-a37f-0358d83e5dcc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="DirectX\DirectX12">
+      <UniqueIdentifier>{6510f1c1-8a72-41da-976a-1d98466fe4cc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="リソース ファイル">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="DirectX\Draw">
+      <UniqueIdentifier>{e0380321-9c92-4bbd-a936-bb68a35d12e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{c32c22eb-ae4d-4475-abe5-32e0d48c7a70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{14b4bba0-d3c4-499d-b76a-f1ac421442e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\IO">
+      <UniqueIdentifier>{f7604760-29d2-46e9-b7de-57840ba82462}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\Temp">
+      <UniqueIdentifier>{7dd50f6a-aa51-4d3a-b972-589e4f93a461}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\Player">
+      <UniqueIdentifier>{1420a0bc-d196-4eed-bbc2-8c20d1a05735}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{1fc0bf2c-bd1c-446b-b07d-e56fadd5c2fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Win32">
+      <UniqueIdentifier>{441d4f62-0f2d-49d8-8b7c-eef92399d63a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DirectX12.cpp">
+      <Filter>DirectX\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw.cpp">
+      <Filter>DirectX\Draw</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Utility\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="tempUtility.cpp">
+      <Filter>Utility\Temp</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Utility\Player</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32.cpp">
+      <Filter>Win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="BasicPS.hlsl">
-      <Filter>ソース ファイル</Filter>
-    </FxCompile>
     <FxCompile Include="BasicVS.hlsl">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="BasicPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DirectX12.h">
+      <Filter>DirectX\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw.h">
+      <Filter>DirectX\Draw</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Utility\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="tempUtility.h">
+      <Filter>Utility\Temp</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Utility\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="includes.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

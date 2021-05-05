@@ -1,13 +1,23 @@
 #pragma once
 class DirectX12
 {
-private: //Win32 etc...
-	HRESULT result;
-	HWND hwnd;
-	int window_width;
-	int window_height;
+public: //Public function
+	//Initialize
+	DirectX12(HWND hwnd, const int window_width, const int window_height);
+	void Initialize_components();
 
-private: //Private function
+	//color getter
+	DirectX::XMFLOAT4 GetColor(const float R, const float G, const float B, const float A);
+
+	//Draw function
+	void ClearDrawScreen(const DirectX::XMFLOAT4 color);
+	void ScreenFlip();
+
+public:
+	ID3D12Device *dev;
+	ID3D12GraphicsCommandList *cmdList;
+
+private:
 	//GPU
 	void D3D12ListUpGPU();
 	void D3D12SelectGPU();
@@ -30,20 +40,18 @@ private: //Private function
 	//Fence
 	void D3D12CreateFence();
 
-public: //Public function
-	//Initialize
-	DirectX12(HWND hwnd, const int window_width, const int window_height);
-	void Initialize_components();
+	//Draw
+	void RestoreResourceBarrierSetting();
+	void SetScissorrect();
+	void SetViewport();
 
-	//Draw function
-	DirectX::XMFLOAT4 GetColor(const float R, const float G, const float B, const float A);
-	void ClearDrawScreen(const DirectX::XMFLOAT4 color);
-	void ScreenFlip();
-
-public: //DirectX12
+private:
+	HRESULT result;
+	HWND hwnd;
+	int window_width;
+	int window_height;
 
 	//GPU
-	ID3D12Device *dev;
 	std::vector<IDXGIAdapter1 *> adapters;
 	IDXGIAdapter1 *tmpAdapter;
 	IDXGIFactory6 *dxgiFactory;
@@ -57,7 +65,6 @@ public: //DirectX12
 
 	//Commands
 	ID3D12CommandAllocator *cmdAllocator;
-	ID3D12GraphicsCommandList *cmdList;
 	ID3D12CommandQueue *cmdQueue;
 	D3D12_COMMAND_QUEUE_DESC cmdQueueDesc;
 
@@ -78,5 +85,7 @@ public: //DirectX12
 
 	//Draw
 	D3D12_RESOURCE_BARRIER barrierDesc;
+	D3D12_VIEWPORT viewport;
+	D3D12_RECT scissorrect;
 };
 

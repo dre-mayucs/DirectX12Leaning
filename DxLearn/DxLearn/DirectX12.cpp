@@ -24,32 +24,32 @@
 DirectX12::DirectX12(HWND hwnd, const int window_width, const int window_height) : hwnd(hwnd), window_width(window_width), window_height(window_height)
 {
 	//GPU
-	result			= S_FALSE;
-	dev				= nullptr;
-	dxgiFactory		= nullptr;
-	tmpAdapter		= nullptr;
-	adapters		= {};
-	featurelevel	= {};
+	result = S_FALSE;
+	dev = nullptr;
+	dxgiFactory = nullptr;
+	tmpAdapter = nullptr;
+	adapters = {};
+	featurelevel = {};
 
 	//Commands
-	cmdAllocator	= nullptr;
-	cmdList			= nullptr;
-	cmdQueue		= nullptr;
-	cmdQueueDesc	= {};
+	cmdAllocator = nullptr;
+	cmdList = nullptr;
+	cmdQueue = nullptr;
+	cmdQueueDesc = {};
 
 	//Swapchain
-	swapchain		= nullptr;
-	swapchainDesc	= {};
+	swapchain = nullptr;
+	swapchainDesc = {};
 
 	//Heap
-	heapDesc		= {};
+	heapDesc = {};
 
 	//Fence
-	fence			= nullptr;
-	fenceVal		= 0;
+	fence = nullptr;
+	fenceVal = 0;
 
 	//Draw
-	barrierDesc		= {};
+	barrierDesc = {};
 }
 
 void DirectX12::Initialize_components()
@@ -102,10 +102,15 @@ void DirectX12::ClearDrawScreen(const DirectX::XMFLOAT4 color)
 	//Display clear
 	float clearColor[] = { color.x, color.y, color.z, color.w };
 	cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
+
+	SetScissorrect();
+	SetViewport();
 }
 
 void DirectX12::ScreenFlip()
 {
+	RestoreResourceBarrierSetting();
+
 	//Close command
 	cmdList->Close();
 
@@ -128,6 +133,36 @@ void DirectX12::ScreenFlip()
 	cmdAllocator->Reset();
 	cmdList->Reset(cmdAllocator, nullptr);
 	swapchain->Present(1, 0);
+}
+
+void DirectX12::RestoreResourceBarrierSetting()
+{
+	barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	cmdList->ResourceBarrier(1, &barrierDesc);
+}
+
+void DirectX12::SetScissorrect()
+{
+	viewport.Width = window_width;
+	viewport.Height = window_height;
+	viewport.TopLeftX = .0f;
+	viewport.TopLeftY = .0f;
+	viewport.MinDepth = .0f;
+	viewport.MaxDepth = 1.f;
+
+	cmdList->RSSetViewports(1, &viewport);
+}
+
+void DirectX12::SetViewport()
+{
+	scissorrect.left = 0L;
+	scissorrect.right = scissorrect.left + window_width;
+	scissorrect.top = 0L;
+	scissorrect.bottom = scissorrect.top + window_height;
+
+	cmdList->RSSetScissorRects(1, &scissorrect);
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 #pragma endregion
 
