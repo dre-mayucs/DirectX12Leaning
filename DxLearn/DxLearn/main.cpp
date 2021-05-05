@@ -6,366 +6,47 @@ const int window_height = 1000;
 //namespace
 using namespace DirectX;
 
+HRESULT result;
+Win32 win32(L"Test", window_width, window_height);
+DirectX12 dx12(win32.hwnd, window_width, window_height);
+
 int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) 
 {
-	HRESULT result;
-
-	//Initialize Win32
-	Win32 win32(L"Test", window_width, window_height);
-
-	//Initialize DirectX12
-	DirectX12 dx12(win32.hwnd, window_width, window_height);
 	dx12.Initialize_components();
 
 	//Initialize IO
 	Input input(win32.w, win32.hwnd);
 
-#pragma region Initialize drawing command
-
-#pragma region Vertex buffer
-	const unsigned int shape_size = 64;
-	float radius = 0.2f;
-	XMFLOAT3 vertices[shape_size + 1];
-	for (auto i = 0; i < _countof(vertices) - 1; ++i) {
-		vertices[i] = {
-			radius * sinf(XM_2PI / shape_size * (i + 1)) * (window_width / window_height),
-			radius * cosf(XM_2PI / shape_size * (i + 1)),
-			0.f,
-		};
-	}
-	vertices[shape_size] = {0, 0, 0};
-
-	UINT sizeVB = static_cast<UINT>(sizeof(XMFLOAT3) * _countof(vertices));
-
-	//Set vertex buffer
-	D3D12_HEAP_PROPERTIES heapprop{};
-	heapprop.Type = D3D12_HEAP_TYPE_UPLOAD;	//Transfer to GPU
-	heapprop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapprop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-
-	//Resource setting
-	D3D12_RESOURCE_DESC resdesc{};
-	resdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	resdesc.Width = sizeVB;
-	resdesc.Height = 1;
-	resdesc.DepthOrArraySize = 1;
-	resdesc.MipLevels = 1;
-	resdesc.Format = DXGI_FORMAT_UNKNOWN;
-	resdesc.SampleDesc.Count = 1;
-	resdesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-	resdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-
-	//Create top buffer
-	ID3D12Resource *verBuff = nullptr;
-	result = dx12.dev->CreateCommittedResource(
-		&heapprop,
-		D3D12_HEAP_FLAG_NONE,
-		&resdesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&verBuff)
-	);
-	assert(result == S_OK);
-
-	//Get VirtualMemory
-	XMFLOAT3 *vertMap = nullptr;
-	result = verBuff->Map(0, nullptr, (void **)&vertMap);
-	assert(result == S_OK);
-
-	std::copy(std::begin(vertices), std::end(vertices), vertMap);
-	for (auto i = 0; i < _countof(vertices); ++i) {
-		vertMap[i] = vertices[i];
-	}
-	verBuff->Unmap(0, nullptr);
-
-	//Create top buffer view
-	D3D12_VERTEX_BUFFER_VIEW vbView{};
-
-	vbView.BufferLocation = verBuff->GetGPUVirtualAddress();
-	/*vbView.SizeInBytes = sizeVB;*/
-	vbView.SizeInBytes = sizeof(vertices);
-	vbView.StrideInBytes = sizeof(XMFLOAT3);
-#pragma endregion
-
-#pragma region Index buffer
-	unsigned short indices[shape_size * 3];
-
-	for (int i = 0; i < shape_size; ++i) {
-		indices[i * 3]			= i;
-		indices[(i * 3) + 1]	= i + 1;
-		indices[(i * 3) + 2]	= shape_size;
-	}
-	indices[(shape_size * 3) - 3]	= shape_size - 1;
-	indices[(shape_size * 3) - 2]	= 0;
-	indices[(shape_size * 3) - 1]	= shape_size;
-
-	//Add index buffer
-	ID3D12Resource *indexBuff = nullptr;
-	resdesc.Width = sizeof(indices);
-	result = dx12.dev->CreateCommittedResource(
-		&heapprop,
-		D3D12_HEAP_FLAG_NONE,
-		&resdesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&indexBuff)
-	);
-	assert(result == S_OK);
-
-	//Get virtual memory
-	unsigned short *indexMap = nullptr;
-	result = indexBuff->Map(0, nullptr, (void **)&indexMap);
-	assert(result == S_OK);
-	for (int i = 0; i < _countof(indices); ++i) {
-		indexMap[i] = indices[i];
-	}
-	indexBuff->Unmap(0, nullptr);
-
-	//Create index buffer view
-	D3D12_INDEX_BUFFER_VIEW ibView{};
-	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
-	ibView.Format = DXGI_FORMAT_R16_UINT;
-	ibView.SizeInBytes = sizeof(indices);
-#pragma endregion
-
-#pragma region Shader
-	ID3DBlob *vsBlob = nullptr;
-	ID3DBlob *psBlob = nullptr;
-	ID3DBlob *errorBlob = nullptr;
-
-	result = D3DCompileFromFile(
-		L"BasicVS.hlsl",
-		nullptr,
-		D3D_COMPILE_STANDARD_FILE_INCLUDE,
-		"main", "vs_5_0",
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
-		0,
-		&vsBlob, &errorBlob
-	);
-	assert(result == S_OK);
-
-	result = D3DCompileFromFile(
-		L"BasicPS.hlsl",
-		nullptr,
-		D3D_COMPILE_STANDARD_FILE_INCLUDE,
-		"main", "ps_5_0",
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
-		0,
-		&psBlob, &errorBlob
-	);
-	assert(result == S_OK);
-#pragma endregion
-
-#pragma region const buffer
-	//Heap
-	D3D12_HEAP_PROPERTIES cbheapprop{};
-	cbheapprop.Type = D3D12_HEAP_TYPE_UPLOAD;
-
-	//Resources
-	D3D12_RESOURCE_DESC cbresdesc{};
-	cbresdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	cbresdesc.Width = (sizeof(ConstBufferData) + 0xff) & ~0xff;
-	cbresdesc.Height = 1;
-	cbresdesc.DepthOrArraySize = 1;
-	cbresdesc.MipLevels = 1;
-	cbresdesc.SampleDesc.Count = 1;
-	cbresdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-
-	//Create
-	ID3D12Resource *constBuff = nullptr;
-	result = dx12.dev->CreateCommittedResource(
-		&cbheapprop,
-		D3D12_HEAP_FLAG_NONE,
-		&cbresdesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&constBuff)
-	);
-	assert(result == S_OK);
-
-	//Descripter heap
-	ID3D12DescriptorHeap *basicDescHeap = nullptr;
-	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc{};
-	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	descHeapDesc.NumDescriptors = 1;
-
-	result = dx12.dev->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&basicDescHeap));
-	assert(result == S_OK);
-
-	//Create const buffer
-	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc{};
-	cbvDesc.BufferLocation = constBuff->GetGPUVirtualAddress();
-	cbvDesc.SizeInBytes = (UINT)constBuff->GetDesc().Width;
-	dx12.dev->CreateConstantBufferView(&cbvDesc, basicDescHeap->GetCPUDescriptorHandleForHeapStart());
-#pragma endregion
-
-	//ErrorMsg
-	if (FAILED(result)) {
-		std::string errstr;
-		errstr.resize(errorBlob->GetBufferSize());
-		std::copy_n(
-			(char *)errorBlob->GetBufferPointer(),
-			errorBlob->GetBufferSize(),
-			errstr.begin()
-		);
-		errstr += "\n";
-		OutputDebugStringA(errstr.c_str());
-		exit(1);
-	}
-
-	//Top layout
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-		{ 
-			"POSITION",
-			0,
-			DXGI_FORMAT_R32G32B32_FLOAT,
-			0,
-			D3D12_APPEND_ALIGNED_ELEMENT,
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-			0
-		},
-	};
-
-	//Graphics pipeline
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
-	gpipeline.pRootSignature = nullptr;
-	gpipeline.VS.pShaderBytecode = vsBlob->GetBufferPointer();
-	gpipeline.VS.BytecodeLength = vsBlob->GetBufferSize();
-	gpipeline.PS.pShaderBytecode = psBlob->GetBufferPointer();
-	gpipeline.PS.BytecodeLength = psBlob->GetBufferSize();
-
-	//SampleMask
-	//RasterizerState
-	//Fill mode
-	gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	gpipeline.RasterizerState.MultisampleEnable = false;
-	gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-	gpipeline.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
-	gpipeline.RasterizerState.DepthClipEnable = true;
-
-	//Blend
-	//gpipeline.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	D3D12_RENDER_TARGET_BLEND_DESC &blenddesc = gpipeline.BlendState.RenderTarget[0];
-	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	blenddesc.BlendEnable = true;
-	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
-	blenddesc.DestBlendAlpha = D3D12_BLEND_ONE;
-
-	//Alpha blend
-	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
-	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-
-	//top layout setting
-	gpipeline.InputLayout.pInputElementDescs = inputLayout;
-	gpipeline.InputLayout.NumElements = _countof(inputLayout);
-	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-	//etc
-	gpipeline.NumRenderTargets = 1;
-	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-	gpipeline.SampleDesc.Count = 1;
-
-	//root parameter
-	D3D12_DESCRIPTOR_RANGE descTblrange{};
-	descTblrange.NumDescriptors = 1;
-	descTblrange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-	descTblrange.BaseShaderRegister = 0;
-	descTblrange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-
-	//setting root parameter
-	D3D12_ROOT_PARAMETER rootparam = {};
-	rootparam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootparam.DescriptorTable.pDescriptorRanges = &descTblrange;
-	rootparam.DescriptorTable.NumDescriptorRanges = 1;
-	rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-
-	//root signeture
-	ID3D12RootSignature *rootsignature;
-	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
-	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	rootSignatureDesc.pParameters = &rootparam;
-	rootSignatureDesc.NumParameters = 1;
-
-	ID3DBlob *rootSigBlob = nullptr;
-	result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
-	assert(result == S_OK);
-
-	result = dx12.dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
-	assert(result == S_OK);
-
-	rootSigBlob->Release();
-
-	//set signature
-	gpipeline.pRootSignature = rootsignature;
-
-	ID3D12PipelineState *pipelinestate = nullptr;
-	result = dx12.dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
-	assert(result == S_OK);
-
-#pragma endregion
+	//InitializeDrawCommands
+	Draw draw(100, 0.5, D3D12_FILL_MODE_WIREFRAME, dx12.dev, dx12.cmdList, window_width, window_height);
+	Draw draw2(50, 1, D3D12_FILL_MODE_WIREFRAME, dx12.dev, dx12.cmdList, window_width, window_height);
 
 	float speed = .01f;
-
 	while (true)
 	{
-#pragma region Frame process
 		dx12.ClearDrawScreen(dx12.GetColor(100, 200, 255, 255));
 		input.Update();
 
-#pragma region Operation
 		if (input.GetKey(DIK_W)) {
-			for (auto &verData : vertices) {
+			for (auto &verData : draw.vertices) {
 				verData.y += speed;
 			}
 		}
 		if (input.GetKey(DIK_S)) {
-			for (auto &verData : vertices) {
+			for (auto &verData : draw.vertices) {
 				verData.y -= speed;
 			}
 		}
 		if (input.GetKey(DIK_A)) {
-			for (auto &verData : vertices) {
+			for (auto &verData : draw.vertices) {
 				verData.x -= speed;
 			}
 		}
 		if (input.GetKey(DIK_D)) {
-			for (auto &verData : vertices) {
+			for (auto &verData : draw.vertices) {
 				verData.x += speed;
 			}
 		}
-#pragma endregion
-
-		//Get VirtualMemory
-		XMFLOAT3 *vertMap = nullptr;
-		result = verBuff->Map(0, nullptr, (void **)&vertMap);
-		assert(result == S_OK);
-
-		//Update point
-		std::copy(std::begin(vertices), std::end(vertices), vertMap);
-		verBuff->Unmap(0, nullptr);
-
-		//Initialize const buffer
-		ConstBufferData *constMap = nullptr;
-		result = constBuff->Map(0, nullptr, (void **)&constMap);
-		constMap->color = input.GetKey(DIK_SPACE) ? dx12.GetColor(0, 0, 0, 100) : dx12.GetColor(0, 0, 0, 255);
-		constBuff->Unmap(0, nullptr);
-		assert(result == S_OK);
-#pragma endregion
-
-#pragma region Draw command
-		//pipeline
-		dx12.cmdList->SetPipelineState(pipelinestate);
-		dx12.cmdList->SetGraphicsRootSignature(rootsignature);
-
-		//Set Descriptor heap
-		ID3D12DescriptorHeap *ppHeaps[] = { basicDescHeap };
-		dx12.cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-		//Set constant buffer view
-		dx12.cmdList->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
 
 		//viewport setting
 		D3D12_VIEWPORT viewport{};
@@ -388,11 +69,9 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		dx12.cmdList->RSSetScissorRects(1, &scissorrect);
 		dx12.cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		dx12.cmdList->IASetVertexBuffers(0, 1, &vbView);
 
-		//Index buffer set command
-		dx12.cmdList->IASetIndexBuffer(&ibView);
-		dx12.cmdList->DrawIndexedInstanced((int)_countof(indices), 1, 0, 0, 0);
+		draw.execute(dx12.GetColor(0, 0, 0, 255));
+		draw2.execute(dx12.GetColor(255, 255, 0, 255));
 
 		//Restore Resource barrier setting(writing inhibition)
 		dx12.barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -403,7 +82,6 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		dx12.ScreenFlip();
 		if (!win32.ProcessMessage()) { break; }
 		if (input.GetKeyDown(DIK_ESCAPE)) { break; }
-#pragma endregion
 	}
 	return 0;
 }

@@ -41,6 +41,7 @@ public: //Public function
 	void ScreenFlip();
 
 public: //DirectX12
+
 	//GPU
 	ID3D12Device *dev;
 	std::vector<IDXGIAdapter1 *> adapters;
