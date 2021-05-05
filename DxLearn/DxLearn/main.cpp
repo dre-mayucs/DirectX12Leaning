@@ -33,7 +33,6 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		dx12.ScreenFlip();
 		if (!win32.ProcessMessage()) { break; }
 		if (input.GetKeyDown(DIK_ESCAPE)) { break; }
-		if (input.GetKeyDown(DIK_ESCAPE)) { break; }
 	}
 	return 0;
 }
