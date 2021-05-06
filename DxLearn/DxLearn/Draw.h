@@ -10,10 +10,13 @@ public:
 	void execute(const DirectX::XMFLOAT4 color);
 
 private:
+	void SetVertices();
 	void SetHeapProperty();
 	void SetResourceDescription();
+	void CreateVertexBuffer();
 	void GetVertexMapVirtualMemory();
 	void SetVertexBufferView();
+	void SetIndices();
 	void SetIndexBuffer();
 	void GetIndexMapVirtualMemory();
 	void SetIndexBufferView();
@@ -24,6 +27,9 @@ private:
 	void CreateConstantBuffer();
 	void SetGraphicsPipeLine(const int fillMode);
 	void SetRenderTargetBlendDescription();
+	void SetRootParameter();
+	void SetRootSignature();
+	void SetSignature();
 
 public:
 	float radius;

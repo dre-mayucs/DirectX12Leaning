@@ -31,6 +31,15 @@
     <Filter Include="Win32">
       <UniqueIdentifier>{441d4f62-0f2d-49d8-8b7c-eef92399d63a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DirectXTK12">
+      <UniqueIdentifier>{f25c661c-a8d1-4c47-8450-c18d00cba3f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectXTK12\include">
+      <UniqueIdentifier>{e54970e8-5170-4c7d-9655-563742ac0b22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectXTK12\lib">
+      <UniqueIdentifier>{f2122b54-a5b8-4a12-9e35-a7118d09657e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectX12.cpp">
@@ -85,5 +94,262 @@
     <ClInclude Include="Win32.h">
       <Filter>Win32</Filter>
     </ClInclude>
+    <ClInclude Include="DirectXTK\include\Audio.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\BufferHelpers.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\CommonStates.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\DDSTextureLoader.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\DescriptorHeap.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\DirectXHelpers.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\EffectPipelineStateDescription.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\Effects.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\GamePad.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\GeometricPrimitive.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\GraphicsMemory.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\Keyboard.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\Model.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\Mouse.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\PostProcess.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\PrimitiveBatch.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\RenderTargetState.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\ResourceUploadBatch.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\ScreenGrab.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\SimpleMath.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\SpriteBatch.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\SpriteFont.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\VertexTypes.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\WICTextureLoader.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXTK\include\XboxDDSTextureLoader.h">
+      <Filter>DirectXTK12\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DirectXTK\include\SimpleMath.inl">
+      <Filter>DirectXTK12\include</Filter>
+    </None>
+    <None Include="DirectXTK\lib\DirectXTK12.idb">
+      <Filter>DirectXTK12\lib</Filter>
+    </None>
+    <None Include="DirectXTK\lib\DirectXTK12.lib.recipe">
+      <Filter>DirectXTK12\lib</Filter>
+    </None>
+    <None Include="DirectXTK\lib\DirectXTK12.pch">
+      <Filter>DirectXTK12\lib</Filter>
+    </None>
+    <None Include="DirectXTK\lib\DirectXTK12.pdb">
+      <Filter>DirectXTK12\lib</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="DirectXTK\lib\AlphaTestEffect.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\AudioEngine.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\BasicEffect.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\BasicPostProcess.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\BinaryReader.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\BufferHelpers.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\CommonStates.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\DDSTextureLoader.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\DebugEffect.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\DescriptorHeap.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\DirectXHelpers.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\DualPostProcess.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\DualTextureEffect.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\DynamicSoundEffectInstance.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\EffectCommon.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\EffectFactory.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\EffectPipelineStateDescription.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\EffectTextureFactory.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\EnvironmentMapEffect.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\GamePad.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\GeometricPrimitive.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\Geometry.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\GraphicsMemory.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\Keyboard.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\LinearAllocator.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\Model.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\ModelLoadSDKMESH.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\ModelLoadVBO.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\Mouse.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\NormalMapEffect.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\PBREffect.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\PBREffectFactory.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\pch.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\PrimitiveBatch.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\ResourceUploadBatch.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\ScreenGrab.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\SimpleMath.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\SkinnedEffect.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\SoundCommon.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\SoundEffect.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\SoundEffectInstance.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\SoundStreamInstance.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\SpriteBatch.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\SpriteFont.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\ToneMapPostProcess.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\VertexTypes.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\WaveBank.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\WaveBankReader.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\WAVFileReader.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+    <Object Include="DirectXTK\lib\WICTextureLoader.obj">
+      <Filter>DirectXTK12\lib</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="DirectXTK\lib\DirectXTK_Desktop_2019_Win10.log">
+      <Filter>DirectXTK12\lib</Filter>
+    </Text>
+    <Text Include="DirectXTK\lib\DirectXTK_Desktop_2019_Win10.vcxproj.FileListAbsolute.txt">
+      <Filter>DirectXTK12\lib</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="DirectXTK\lib\DirectXTK12.lib">
+      <Filter>DirectXTK12\lib</Filter>
+    </Library>
   </ItemGroup>
 </Project>

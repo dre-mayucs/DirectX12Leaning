@@ -25,6 +25,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		player.Operation(&Circle.vertices, &input);
 
+
 		//Draw
 		Circle2.execute(dx12.GetColor(255, 255, 0, 255));
 		Circle.execute(dx12.GetColor(50, 255, 50, 255));

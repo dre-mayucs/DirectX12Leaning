@@ -22,45 +22,13 @@ Draw::Draw(const unsigned int shapeSize, const float radius, const int fillMode,
 	dev(dev),
 	cmdList(cmdList)
 {
-	vertices = std::vector<DirectX::XMFLOAT3>(shapeSize + 1);
-	for (auto i = 0; i < vertices.size() - 1; ++i) {
-		vertices[i] = {
-			radius * sinf(DirectX::XM_2PI / shapeSize * (i + 1)),
-			radius * cosf(DirectX::XM_2PI / shapeSize * (i + 1)),
-			0.f,
-		};
-	}
-	vertices[shapeSize] = { 0, 0, 0 };
-	sizeVB = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * vertices.size());
-
+	SetVertices();
 	SetHeapProperty();
 	SetResourceDescription();
-
-	//Create top buffer
-	verBuff = nullptr;
-	result = this->dev->CreateCommittedResource(
-		&heapprop,
-		D3D12_HEAP_FLAG_NONE,
-		&resdesc,
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&verBuff)
-	);
-	assert(result == S_OK);
-
+	CreateVertexBuffer();
 	GetVertexMapVirtualMemory();
 	SetVertexBufferView();
-
-	indices = std::vector<unsigned short>(shapeSize * 3);
-	for (int i = 0; i < shapeSize; ++i) {
-		indices[i * 3] = i;
-		indices[(i * 3) + 1] = i + 1;
-		indices[(i * 3) + 2] = shapeSize;
-	}
-	indices[(shapeSize * 3) - 3] = shapeSize - 1;
-	indices[(shapeSize * 3) - 2] = 0;
-	indices[(shapeSize * 3) - 1] = shapeSize;
-
+	SetIndices();
 	SetIndexBuffer();
 	GetIndexMapVirtualMemory();
 	SetIndexBufferView();
@@ -85,7 +53,15 @@ Draw::Draw(const unsigned int shapeSize, const float radius, const int fillMode,
 
 	SetGraphicsPipeLine(fillMode);
 	SetRenderTargetBlendDescription();
-	SetGraphicsPipeLine(inputLayout);
+
+	//top layout setting
+	gpipeline.InputLayout.pInputElementDescs = inputLayout;
+	gpipeline.InputLayout.NumElements = std::extent<decltype(inputLayout), 0>::value;
+	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	gpipeline.NumRenderTargets = 1;
+	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	gpipeline.SampleDesc.Count = 1;
+
 	SetRootParameter();
 	SetRootSignature();
 	SetSignature();
@@ -125,6 +101,20 @@ void Draw::execute(const DirectX::XMFLOAT4 color)
 	cmdList->DrawIndexedInstanced((int)indices.size(), 1, 0, 0, 0);
 }
 
+void Draw::SetVertices()
+{
+	vertices = std::vector<DirectX::XMFLOAT3>(shapeSize + 1);
+	for (auto i = 0; i < vertices.size() - 1; ++i) {
+		vertices[i] = {
+			radius * sinf(DirectX::XM_2PI / shapeSize * (i + 1)),
+			radius * cosf(DirectX::XM_2PI / shapeSize * (i + 1)),
+			0.f,
+		};
+	}
+	vertices[shapeSize] = { 0, 0, 0 };
+	sizeVB = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * vertices.size());
+}
+
 void Draw::SetHeapProperty()
 {
 	//Set vertex buffer
@@ -149,6 +139,21 @@ void Draw::SetResourceDescription()
 	resdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 }
 
+void Draw::CreateVertexBuffer()
+{
+	//Create top buffer
+	verBuff = nullptr;
+	result = this->dev->CreateCommittedResource(
+		&heapprop,
+		D3D12_HEAP_FLAG_NONE,
+		&resdesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&verBuff)
+	);
+	assert(result == S_OK);
+}
+
 void Draw::SetVertexBufferView()
 {
 	//Create vertex buffer view
@@ -156,6 +161,19 @@ void Draw::SetVertexBufferView()
 	vbView.BufferLocation = verBuff->GetGPUVirtualAddress();
 	vbView.SizeInBytes = sizeof(DirectX::XMFLOAT3) * vertices.size();
 	vbView.StrideInBytes = sizeof(DirectX::XMFLOAT3);
+}
+
+void Draw::SetIndices()
+{
+	indices = std::vector<unsigned short>(shapeSize * 3);
+	for (int i = 0; i < shapeSize; ++i) {
+		indices[i * 3] = i;
+		indices[(i * 3) + 1] = i + 1;
+		indices[(i * 3) + 2] = shapeSize;
+	}
+	indices[(shapeSize * 3) - 3] = shapeSize - 1;
+	indices[(shapeSize * 3) - 2] = 0;
+	indices[(shapeSize * 3) - 1] = shapeSize;
 }
 
 void Draw::SetIndexBuffer()
@@ -306,19 +324,6 @@ void Draw::SetGraphicsPipeLine(const int fillMode)
 	gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	gpipeline.RasterizerState.FillMode = (D3D12_FILL_MODE)fillMode;
 	gpipeline.RasterizerState.DepthClipEnable = true;
-}
-
-void Draw::SetGraphicsPipeLine(const D3D12_INPUT_ELEMENT_DESC *inputLayout)
-{
-	//top layout setting
-	gpipeline.InputLayout.pInputElementDescs = inputLayout;
-	gpipeline.InputLayout.NumElements = std::extent<decltype(inputLayout), 0>::value;
-	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-	//etc
-	gpipeline.NumRenderTargets = 1;
-	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-	gpipeline.SampleDesc.Count = 1;
 }
 
 void Draw::SetRenderTargetBlendDescription()

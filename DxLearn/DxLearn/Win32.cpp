@@ -11,10 +11,7 @@ LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-Win32::Win32(const wchar_t *DisplayName, const unsigned int DisplaySize_X, const unsigned int DisplaySize_Y) : 
-	DisplayName(DisplayName),
-	DisplaySize_X(DisplaySize_X),
-	DisplaySize_Y(DisplaySize_Y)
+Win32::Win32(const wchar_t *DisplayName, const unsigned int DisplaySize_X, const unsigned int DisplaySize_Y) : DisplayName(DisplayName)
 {
 	w.cbSize = sizeof(WNDCLASSEX);
 	w.lpfnWndProc = (WNDPROC)WindowProc;
