@@ -9,6 +9,22 @@ public:
 	Draw(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
 	void execute(const DirectX::XMFLOAT4 color);
 
+private:
+	void SetHeapProperty();
+	void SetResourceDescription();
+	void GetVertexMapVirtualMemory();
+	void SetVertexBufferView();
+	void SetIndexBuffer();
+	void GetIndexMapVirtualMemory();
+	void SetIndexBufferView();
+	void SetShader();
+	void SetConstantBufferHeapProperty();
+	void SetConstantBufferResourceDescription();
+	void SetDescripterHeap();
+	void CreateConstantBuffer();
+	void SetGraphicsPipeLine(const int fillMode);
+	void SetRenderTargetBlendDescription();
+
 public:
 	float radius;
 	unsigned int shapeSize;
