@@ -20,7 +20,9 @@ Draw::Draw(const unsigned int shapeSize, const float radius, const int fillMode,
 	shapeSize(shapeSize),
 	radius(radius),
 	dev(dev),
-	cmdList(cmdList)
+	cmdList(cmdList),
+	window_width(window_width),
+	window_height(window_height)
 {
 	SetVertices();
 	SetHeapProperty();
@@ -104,10 +106,10 @@ void Draw::execute(const DirectX::XMFLOAT4 color)
 void Draw::SetVertices()
 {
 	vertices = std::vector<DirectX::XMFLOAT3>(shapeSize + 1);
-	for (auto i = 0; i < vertices.size() - 1; ++i) {
+	for (auto i = 0; i < shapeSize; ++i) {
 		vertices[i] = {
-			radius * sinf(DirectX::XM_2PI / shapeSize * (i + 1)),
-			radius * cosf(DirectX::XM_2PI / shapeSize * (i + 1)),
+			(float)radius * sinf(DirectX::XM_2PI / shapeSize * i) * window_height / window_width,
+			(float)radius * cosf(2 * DirectX::XM_PI / shapeSize * i),
 			0.f,
 		};
 	}

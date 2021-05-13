@@ -8,6 +8,7 @@ private:
 public:
 	Draw(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
 	void execute(const DirectX::XMFLOAT4 color);
+	void SetPos(const DirectX::XMFLOAT3 pos);
 
 private:
 	void SetVertices();

@@ -53,7 +53,7 @@ HRESULT Input::Update()
 
 bool Input::GetKey(const int KeyCode)
 {
-	return latest_Key[KeyCode] ? true : false;
+	return latest_Key[KeyCode];
 }
 
 bool Input::GetKeyDown(const int KeyCode)
