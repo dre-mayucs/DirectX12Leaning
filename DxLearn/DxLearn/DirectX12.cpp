@@ -116,7 +116,7 @@ void DirectX12::ScreenFlip()
 
 	//Run commandlist
 	ID3D12CommandList *cmdLists[] = { cmdList };
-	cmdQueue->ExecuteCommandLists(1, cmdLists);
+	cmdQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
 
 	//awaiting run commandlist
 	cmdQueue->Signal(fence, ++fenceVal);
