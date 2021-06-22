@@ -14,5 +14,5 @@ float4 main(VSOutput input) : SV_TARGET
     float diffuse = saturate(dot(-(light), input.normal));
     float brightness = diffuse + 0.3f;
 
-    return float4(texcolor.rgb * brightness, texcolor.a)/* * color*/;
+    return float4(texcolor.rgb * brightness, texcolor.a) * color;
 }

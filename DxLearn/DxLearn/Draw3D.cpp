@@ -12,7 +12,6 @@
 
 //Utility
 #include "tempUtility.h"
-
 #include "Draw3D.h"
 
 Draw3D::Draw3D(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
@@ -20,6 +19,7 @@ Draw3D::Draw3D(const unsigned int shapeSize, const float radius, const int fillM
 	radius(radius),
 	dev(dev),
 	cmdList(cmdList),
+	dsvHeap(dsvHeap),
 	window_width(window_width),
 	window_height(window_height)
 {
@@ -38,6 +38,7 @@ Draw3D::Draw3D(const unsigned int shapeSize, const float radius, const int fillM
 	SetConstantBufferResourceDescription();
 	SetDescripterHeap();
 	CreateConstantBuffer();
+	CreateTextureData();
 
 	//Top layout
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -45,6 +46,12 @@ Draw3D::Draw3D(const unsigned int shapeSize, const float radius, const int fillM
 		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,	0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 	};
+
+	CreateWorldMatrix();
+	CreateViewMatrix();
+	MappingConstBuffer();
+	SetDepthCulling();
+	SetNormalVector();
 
 	SetGraphicsPipeLine(fillMode);
 
@@ -62,10 +69,10 @@ Draw3D::Draw3D(const unsigned int shapeSize, const float radius, const int fillM
 	SetSignature();
 }
 
-void Draw3D::execute(const DirectX::XMFLOAT4 color)
+void Draw3D::execute(const DirectX::XMFLOAT4 color, const DirectX::XMMATRIX Translation)
 {
 	//Get VirtualMemory
-	Vertex3D *vertMap = nullptr;
+	vertMap = nullptr;
 	result = verBuff->Map(0, nullptr, (void **)&vertMap);
 	assert(result == S_OK);
 
@@ -73,12 +80,22 @@ void Draw3D::execute(const DirectX::XMFLOAT4 color)
 	std::copy(vertices.begin(), vertices.end(), vertMap);
 	verBuff->Unmap(0, nullptr);
 
-	//Initialize const buffer
-	ConstBufferData *constMap = nullptr;
+	//matRot = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(1.0f)) * DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(1.0f));
+	matTrans = Translation;
+
+	matWorld *= matScale;
+	matWorld *= matRot;
+	matWorld = matTrans;
+
+	matView = DirectX::XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+
+	constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void **)&constMap);
-	constMap->color = color;
-	constBuff->Unmap(0, nullptr);
 	assert(result == S_OK);
+
+	constMap->color = color;
+	constMap->mat = matWorld * matView * matProjection;
+	constBuff->Unmap(0, nullptr);
 
 	//pipeline
 	cmdList->SetPipelineState(pipelinestate);
@@ -97,7 +114,14 @@ void Draw3D::execute(const DirectX::XMFLOAT4 color)
 	//Set constant buffer view
 	/*cmdList->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());*/
 
+	/*cmdList->IASetVertexBuffers(0, 1, &vbView);
+	cmdList->IASetIndexBuffer(&ibView);
+	cmdList->DrawIndexedInstanced((int)indices.size(), 1, 0, 0, 0);*/
+
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	cmdList->IASetVertexBuffers(0, 1, &vbView);
+
+	//Index buffer set command
 	cmdList->IASetIndexBuffer(&ibView);
 	cmdList->DrawIndexedInstanced((int)indices.size(), 1, 0, 0, 0);
 }
@@ -413,7 +437,7 @@ void Draw3D::MappingConstBuffer()
 
 void Draw3D::SetDepthCulling()
 {
-	D3D12_RESOURCE_DESC depthResDesc{};
+	depthResDesc = {};
 	depthResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	depthResDesc.Width = window_width;
 	depthResDesc.Height = window_height;
@@ -422,14 +446,14 @@ void Draw3D::SetDepthCulling()
 	depthResDesc.SampleDesc.Count = 1;
 	depthResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
-	D3D12_HEAP_PROPERTIES depthHeapProp{};
+	depthHeapProp = {};
 	depthHeapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-	D3D12_CLEAR_VALUE depthClearValue{};
+	depthClearValue = {};
 	depthClearValue.DepthStencil.Depth = 1.0f;
 	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
 
-	ID3D12Resource *depthBuffer = nullptr;
+	depthBuffer = nullptr;
 	result = this->dev->CreateCommittedResource(
 		&depthHeapProp,
 		D3D12_HEAP_FLAG_NONE,
@@ -439,13 +463,14 @@ void Draw3D::SetDepthCulling()
 		IID_PPV_ARGS(&depthBuffer)
 	);
 
-	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
+	dsvHeapDesc = {};
 	dsvHeapDesc.NumDescriptors = 1;
 	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;	//DepthStencilView
-	ID3D12DescriptorHeap *dsvHeap = nullptr;
+
+	dsvHeap = nullptr;
 	result = this->dev->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&dsvHeap));
 
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc = {};
 	dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 	this->dev->CreateDepthStencilView(

@@ -18,35 +18,23 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	//InitializeDrawCommands
 	/*Draw Circle(100, 0.1, D3D12_FILL_MODE_SOLID, dx12.dev, dx12.cmdList, window_width, window_height);
 	Draw Circle2(50, 1, D3D12_FILL_MODE_SOLID, dx12.dev, dx12.cmdList, window_width, window_height);*/
-	Draw3D hoge(3, 1, D3D12_FILL_MODE_SOLID, dx12.dev, dx12.cmdList, window_width, window_height);
+	Draw3D hoge0(3, 10, D3D12_FILL_MODE_SOLID, dx12.dev, dx12.cmdList, window_width, window_height);
+	Draw3D hoge1(3, 10, D3D12_FILL_MODE_SOLID, dx12.dev, dx12.cmdList, window_width, window_height);
 
 	//Clear color
 	DirectX::XMFLOAT4 clearColor;
 
 	//Circle color
-	DirectX::XMFLOAT4 circleColor;
+	DirectX::XMFLOAT4 circleColor = dx12.GetColor(255, 0, 255, 255);
 
 	while (true)
 	{
 		input.Update();
+		dx12.ClearDrawScreen(dx12.GetColor(100, 200, 255, 255));
 
-		if (input.GetKey(DIK_SPACE)) {
-			clearColor = dx12.GetColor(100, 255, 200, 255);
-		}
-		else {
-			clearColor = dx12.GetColor(100, 200, 255, 255);
-		}
+		hoge0.execute(dx12.GetColor(255, 255, 255, 255), DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f));
+		hoge1.execute(dx12.GetColor(0, 0, 0, 255), DirectX::XMMatrixTranslation(-20.0f, 0.0f, 0.0f));
 
-		dx12.ClearDrawScreen(clearColor);
-
-		/*player.Operation(&Circle.vertices, &input);*/
-
-		//Draw
-		/*Circle2.execute(dx12.GetColor(255, 255, 0, 255));
-		Circle.execute(circleColor);*/
-		hoge.execute(dx12.GetColor(255, 255, 255, 255));
-
-		//Change display
 		dx12.ScreenFlip();
 		if (!win32.ProcessMessage()) { break; }
 		if (input.GetKeyDown(DIK_ESCAPE)) { break; }

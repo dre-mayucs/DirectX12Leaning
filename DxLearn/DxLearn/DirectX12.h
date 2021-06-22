@@ -16,6 +16,7 @@ public: //Public function
 public:
 	ID3D12Device *dev;
 	ID3D12GraphicsCommandList *cmdList;
+	//ID3D12DescriptorHeap *dsvHeap;
 
 private:
 	//GPU

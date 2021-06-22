@@ -17,6 +17,7 @@
 
 //Utility
 #include "tempUtility.h"
+#include "Draw3D.h"
 
 //this me
 #include "DirectX12.h"
@@ -103,6 +104,29 @@ void DirectX12::ClearDrawScreen(const DirectX::XMFLOAT4 color)
 	float clearColor[] = { color.x, color.y, color.z, color.w };
 	cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 
+
+	////Get buck buffer number
+	//UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
+
+	////Resources barrier(change OP)
+	//D3D12_RESOURCE_BARRIER barrierDesc{};
+	//barrierDesc.Transition.pResource = backBuffers[bbIndex];
+	//barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;		//view
+	//barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;	//draw
+	//cmdList->ResourceBarrier(1, &barrierDesc);
+
+	////Get Render target view discriper heap handle
+	//D3D12_CPU_DESCRIPTOR_HANDLE rtvH = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
+	//rtvH.ptr += bbIndex * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
+
+	//D3D12_CPU_DESCRIPTOR_HANDLE dsvH = dsvHeap->GetCPUDescriptorHandleForHeapStart();
+	//cmdList->OMSetRenderTargets(1, &rtvH, false, &dsvH);
+
+	////Display clear
+	//float clearColor[] = { color.x, color.y, color.z, color.w };
+	//cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
+	//cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
 	SetScissorrect();
 	SetViewport();
 }
@@ -116,7 +140,7 @@ void DirectX12::ScreenFlip()
 
 	//Run commandlist
 	ID3D12CommandList *cmdLists[] = { cmdList };
-	cmdQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
+	cmdQueue->ExecuteCommandLists(1, cmdLists);
 
 	//awaiting run commandlist
 	cmdQueue->Signal(fence, ++fenceVal);
@@ -152,6 +176,7 @@ void DirectX12::SetScissorrect()
 	viewport.MaxDepth = 1.f;
 
 	cmdList->RSSetViewports(1, &viewport);
+	
 }
 
 void DirectX12::SetViewport()
