@@ -9,11 +9,14 @@ public: //Public function
 	//color getter
 	DirectX::XMFLOAT4 GetColor(const float R, const float G, const float B, const float A);
 
+	ID3D12Device *GetDevice();
+	ID3D12GraphicsCommandList *GetCommandList();
+
 	//Draw function
 	void ClearDrawScreen(const DirectX::XMFLOAT4 color);
 	void ScreenFlip();
 
-public:
+private:
 	ID3D12Device *dev;
 	ID3D12GraphicsCommandList *cmdList;
 	//ID3D12DescriptorHeap *dsvHeap;

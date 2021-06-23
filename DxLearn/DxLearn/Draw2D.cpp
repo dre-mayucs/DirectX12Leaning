@@ -14,9 +14,9 @@
 #include "tempUtility.h"
 
 //this
-#include "Draw.h"
+#include "Draw2D.h"
 
-Draw::Draw(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
+Draw2D::Draw2D(const unsigned int shapeSize, const float radius, const int fillMode, z) :
 	shapeSize(shapeSize),
 	radius(radius),
 	dev(dev),
@@ -69,7 +69,7 @@ Draw::Draw(const unsigned int shapeSize, const float radius, const int fillMode,
 	SetSignature();
 }
 
-void Draw::execute(const DirectX::XMFLOAT4 color)
+void Draw2D::execute(const DirectX::XMFLOAT4 color)
 {
 	//Get VirtualMemory
 	DirectX::XMFLOAT3 *vertMap = nullptr;
@@ -103,7 +103,7 @@ void Draw::execute(const DirectX::XMFLOAT4 color)
 	cmdList->DrawIndexedInstanced((int)indices.size(), 1, 0, 0, 0);
 }
 
-void Draw::SetVertices()
+void Draw2D::SetVertices()
 {
 	vertices = std::vector<DirectX::XMFLOAT3>(shapeSize + 1);
 	for (auto i = 0; i < shapeSize; ++i) {
@@ -117,7 +117,7 @@ void Draw::SetVertices()
 	sizeVB = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * vertices.size());
 }
 
-void Draw::SetHeapProperty()
+void Draw2D::SetHeapProperty()
 {
 	//Set vertex buffer
 	heapprop = {};
@@ -126,7 +126,7 @@ void Draw::SetHeapProperty()
 	heapprop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 }
 
-void Draw::SetResourceDescription()
+void Draw2D::SetResourceDescription()
 {
 	//Resource setting
 	resdesc = {};
@@ -141,7 +141,7 @@ void Draw::SetResourceDescription()
 	resdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 }
 
-void Draw::CreateVertexBuffer()
+void Draw2D::CreateVertexBuffer()
 {
 	//Create top buffer
 	verBuff = nullptr;
@@ -156,7 +156,7 @@ void Draw::CreateVertexBuffer()
 	assert(result == S_OK);
 }
 
-void Draw::SetVertexBufferView()
+void Draw2D::SetVertexBufferView()
 {
 	//Create vertex buffer view
 	vbView = {};
@@ -165,7 +165,7 @@ void Draw::SetVertexBufferView()
 	vbView.StrideInBytes = sizeof(DirectX::XMFLOAT3);
 }
 
-void Draw::SetIndices()
+void Draw2D::SetIndices()
 {
 	indices = std::vector<unsigned short>(shapeSize * 3);
 	for (int i = 0; i < shapeSize; ++i) {
@@ -178,7 +178,7 @@ void Draw::SetIndices()
 	indices[(shapeSize * 3) - 1] = shapeSize;
 }
 
-void Draw::SetIndexBuffer()
+void Draw2D::SetIndexBuffer()
 {
 	//Add index buffer
 	indexBuff = nullptr;
@@ -194,7 +194,7 @@ void Draw::SetIndexBuffer()
 	assert(result == S_OK);
 }
 
-void Draw::GetIndexMapVirtualMemory()
+void Draw2D::GetIndexMapVirtualMemory()
 {
 	//Get virtual memory
 	indexMap = nullptr;
@@ -206,7 +206,7 @@ void Draw::GetIndexMapVirtualMemory()
 	indexBuff->Unmap(0, nullptr);
 }
 
-void Draw::GetVertexMapVirtualMemory()
+void Draw2D::GetVertexMapVirtualMemory()
 {
 	//Get VirtualMemory
 	vertMap = nullptr;
@@ -220,7 +220,7 @@ void Draw::GetVertexMapVirtualMemory()
 	verBuff->Unmap(0, nullptr);
 }
 
-void Draw::SetIndexBufferView()
+void Draw2D::SetIndexBufferView()
 {
 	//Create index buffer view
 	ibView = {};
@@ -229,7 +229,7 @@ void Draw::SetIndexBufferView()
 	ibView.SizeInBytes = sizeof(unsigned short) * indices.size();
 }
 
-void Draw::SetShader()
+void Draw2D::SetShader()
 {
 	//shader
 	vsBlob = nullptr;
@@ -259,13 +259,13 @@ void Draw::SetShader()
 	assert(result == S_OK);
 }
 
-void Draw::SetConstantBufferHeapProperty()
+void Draw2D::SetConstantBufferHeapProperty()
 {
 	//Heap
 	cbheapprop.Type = D3D12_HEAP_TYPE_UPLOAD;
 }
 
-void Draw::SetConstantBufferResourceDescription()
+void Draw2D::SetConstantBufferResourceDescription()
 {
 	//Resources
 	cbresdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -289,7 +289,7 @@ void Draw::SetConstantBufferResourceDescription()
 	assert(result == S_OK);
 }
 
-void Draw::SetDescripterHeap()
+void Draw2D::SetDescripterHeap()
 {
 	//Descripter heap
 	basicDescHeap = nullptr;
@@ -301,7 +301,7 @@ void Draw::SetDescripterHeap()
 	assert(result == S_OK);
 }
 
-void Draw::CreateConstantBuffer()
+void Draw2D::CreateConstantBuffer()
 {
 	//Create const buffer
 	cbvDesc.BufferLocation = constBuff->GetGPUVirtualAddress();
@@ -309,7 +309,7 @@ void Draw::CreateConstantBuffer()
 	this->dev->CreateConstantBufferView(&cbvDesc, basicDescHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
-void Draw::SetGraphicsPipeLine(const int fillMode)
+void Draw2D::SetGraphicsPipeLine(const int fillMode)
 {
 	//Graphics pipeline
 	gpipeline.pRootSignature = nullptr;
@@ -328,7 +328,7 @@ void Draw::SetGraphicsPipeLine(const int fillMode)
 	gpipeline.RasterizerState.DepthClipEnable = true;
 }
 
-void Draw::SetRenderTargetBlendDescription()
+void Draw2D::SetRenderTargetBlendDescription()
 {
 	//Blend
 	D3D12_RENDER_TARGET_BLEND_DESC &blenddesc = gpipeline.BlendState.RenderTarget[0];
@@ -344,7 +344,7 @@ void Draw::SetRenderTargetBlendDescription()
 	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 }
 
-void Draw::SetRootParameter()
+void Draw2D::SetRootParameter()
 {
 	//root parameter
 	descTblrange.NumDescriptors = 1;
@@ -359,7 +359,7 @@ void Draw::SetRootParameter()
 	rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 }
 
-void Draw::SetRootSignature()
+void Draw2D::SetRootSignature()
 {
 	//root signeture
 	rootsignature = nullptr;
@@ -377,7 +377,7 @@ void Draw::SetRootSignature()
 	rootSigBlob->Release();
 }
 
-void Draw::SetSignature()
+void Draw2D::SetSignature()
 {
 	//set signature
 	gpipeline.pRootSignature = rootsignature;

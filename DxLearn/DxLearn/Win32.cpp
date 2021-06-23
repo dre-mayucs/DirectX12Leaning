@@ -53,3 +53,18 @@ bool Win32::ProcessMessage()
 
 	return !(msg.message == WM_QUIT);
 }
+
+const wchar_t *Win32::GetDisplayname() const
+{
+	return DisplayName;
+}
+
+WNDCLASSEX Win32::GetWindowClass() const
+{
+	return w;
+}
+
+HWND Win32::GetHandleWindow() const
+{
+	return hwnd;
+}

@@ -84,6 +84,16 @@ DirectX::XMFLOAT4 DirectX12::GetColor(const float R, const float G, const float 
 	return DirectX::XMFLOAT4(R / 255, G / 255, B / 255, A / 255);
 }
 
+ID3D12Device *DirectX12::GetDevice()
+{
+	return dev;
+}
+
+ID3D12GraphicsCommandList *DirectX12::GetCommandList()
+{
+	return cmdList;
+}
+
 void DirectX12::ClearDrawScreen(const DirectX::XMFLOAT4 color)
 {
 	//Get buck buffer number

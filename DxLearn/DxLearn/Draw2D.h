@@ -1,12 +1,12 @@
 #pragma once
-class Draw
+class Draw2D
 {
 private:
 	int window_width;
 	int window_height;
 
 public:
-	Draw(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
+	Draw2D(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
 	void execute(const DirectX::XMFLOAT4 color);
 	void SetPos(const DirectX::XMFLOAT3 pos);
 
@@ -32,7 +32,7 @@ private:
 	void SetRootSignature();
 	void SetSignature();
 
-public:
+private:
 	float radius;
 	unsigned int shapeSize;
 
@@ -45,7 +45,7 @@ public:
 	ID3D12Device *dev;
 	ID3D12GraphicsCommandList *cmdList;
 
-public:
+private:
 	D3D12_HEAP_PROPERTIES heapprop;
 	D3D12_RESOURCE_DESC resdesc;
 	ID3D12Resource *verBuff;
