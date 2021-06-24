@@ -1,3 +1,7 @@
+![State](https://img.shields.io/badge/State-In%20progress-brightgreen?style=flat-square)
+![lang](https://img.shields.io/badge/Language-C%2B%2B%2FHLSL-blue?style=flat-square)
+![lib](https://img.shields.io/badge/Type-Desktop-blue?style=flat-square)
+![lib](https://img.shields.io/badge/Lib-DirectX12%2FDirectXTex-%236658A6?style=flat-square)
 # DirectX12Leaning
 ※これは僕の学習用に開発している描画エンジン/ライブラリであり、実務用途での使用を想定していません。
 
