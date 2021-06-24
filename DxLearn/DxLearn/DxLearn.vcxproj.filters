@@ -7,9 +7,6 @@
     <Filter Include="DirectX\DirectX12">
       <UniqueIdentifier>{6510f1c1-8a72-41da-976a-1d98466fe4cc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DirectX\Draw">
-      <UniqueIdentifier>{e0380321-9c92-4bbd-a936-bb68a35d12e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader">
       <UniqueIdentifier>{c32c22eb-ae4d-4475-abe5-32e0d48c7a70}</UniqueIdentifier>
     </Filter>
@@ -21,9 +18,6 @@
     </Filter>
     <Filter Include="Utility\Temp">
       <UniqueIdentifier>{7dd50f6a-aa51-4d3a-b972-589e4f93a461}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utility\Player">
-      <UniqueIdentifier>{1420a0bc-d196-4eed-bbc2-8c20d1a05735}</UniqueIdentifier>
     </Filter>
     <Filter Include="System">
       <UniqueIdentifier>{1fc0bf2c-bd1c-446b-b07d-e56fadd5c2fe}</UniqueIdentifier>
@@ -40,14 +34,29 @@
     <Filter Include="DirectXTK12\lib">
       <UniqueIdentifier>{f2122b54-a5b8-4a12-9e35-a7118d09657e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DirectX\Draw3D">
-      <UniqueIdentifier>{2997ced9-791d-496a-a4a4-a209e00f27cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader\2D">
       <UniqueIdentifier>{1157e543-05a0-4589-891a-23fcc431f571}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shader\3D">
       <UniqueIdentifier>{43469395-4518-4900-bc15-657abeddfed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX\Draw">
+      <UniqueIdentifier>{d270602e-c97a-406e-a9f2-ea684ed62d3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX\Draw\Draw3D">
+      <UniqueIdentifier>{2997ced9-791d-496a-a4a4-a209e00f27cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX\Draw\Draw2D">
+      <UniqueIdentifier>{e0380321-9c92-4bbd-a936-bb68a35d12e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX\Draw\Utility">
+      <UniqueIdentifier>{9fe9c7ee-d69d-4a96-b65e-0b8d5eb37530}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Operation">
+      <UniqueIdentifier>{5fd8953a-5eb5-43d2-9449-b2ab5e74b772}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Operation\PLayer">
+      <UniqueIdentifier>{df5ec89c-d0c8-4f63-b883-af02a1a3cc18}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,14 +66,11 @@
     <ClCompile Include="DirectX12.cpp">
       <Filter>DirectX\DirectX12</Filter>
     </ClCompile>
-    <ClCompile Include="Draw.cpp">
-      <Filter>DirectX\Draw</Filter>
+    <ClCompile Include="Draw2D.cpp">
+      <Filter>DirectX\Draw\Draw2D</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Utility\IO</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Utility\Player</Filter>
     </ClCompile>
     <ClCompile Include="tempUtility.cpp">
       <Filter>Utility\Temp</Filter>
@@ -73,7 +79,13 @@
       <Filter>Win32</Filter>
     </ClCompile>
     <ClCompile Include="Draw3D.cpp">
-      <Filter>DirectX\Draw3D</Filter>
+      <Filter>DirectX\Draw\Draw3D</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawUtility.cpp">
+      <Filter>DirectX\Draw\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerOP.cpp">
+      <Filter>Operation\PLayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -94,14 +106,11 @@
     <ClInclude Include="DirectX12.h">
       <Filter>DirectX\DirectX12</Filter>
     </ClInclude>
-    <ClInclude Include="Draw.h">
-      <Filter>DirectX\Draw</Filter>
+    <ClInclude Include="Draw2D.h">
+      <Filter>DirectX\Draw\Draw2D</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Utility\IO</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Utility\Player</Filter>
     </ClInclude>
     <ClInclude Include="tempUtility.h">
       <Filter>Utility\Temp</Filter>
@@ -113,7 +122,13 @@
       <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="Draw3D.h">
-      <Filter>DirectX\Draw3D</Filter>
+      <Filter>DirectX\Draw\Draw3D</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawUtility.h">
+      <Filter>DirectX\Draw\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerOP.h">
+      <Filter>Operation\PLayer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

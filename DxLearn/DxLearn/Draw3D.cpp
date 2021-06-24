@@ -82,10 +82,10 @@ void Draw3D::execute(const DirectX::XMFLOAT4 color, const DirectX::XMMATRIX Tran
 
 	//matRot = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(1.0f)) * DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(1.0f));
 	matTrans = Translation;
-
+	matWorld = DirectX::XMMatrixIdentity();
 	matWorld *= matScale;
 	matWorld *= matRot;
-	matWorld = matTrans;
+	matWorld *= matTrans;
 
 	matView = DirectX::XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 

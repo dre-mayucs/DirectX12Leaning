@@ -16,7 +16,7 @@
 //this
 #include "Draw2D.h"
 
-Draw2D::Draw2D(const unsigned int shapeSize, const float radius, const int fillMode, z) :
+Draw2D::Draw2D(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
 	shapeSize(shapeSize),
 	radius(radius),
 	dev(dev),

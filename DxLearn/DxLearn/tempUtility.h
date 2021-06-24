@@ -23,6 +23,13 @@ struct Vertex
 	DirectX::XMFLOAT3 pos;
 };
 
+struct Position3D
+{
+	float x = 0;
+	float y = 0;
+	float z = 0;
+};
+
 class tempUtility
 {
 public:

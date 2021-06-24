@@ -13,6 +13,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 //STL
+#include <ctime>
 #include <vector>
 #include <string>
 #include <assert.h>
@@ -23,6 +24,6 @@
 #include "Win32.h"
 #include "tempUtility.h"
 #include "DirectX12.h"
-#include "Player.h"
+#include "PlayerOP.h"
 #include "Draw2D.h"
 #include "Draw3D.h"
