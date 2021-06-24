@@ -96,3 +96,5 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	return 0;
 }
 ```
+©2021 わんころメソッド();
+©2021 wnkr();
