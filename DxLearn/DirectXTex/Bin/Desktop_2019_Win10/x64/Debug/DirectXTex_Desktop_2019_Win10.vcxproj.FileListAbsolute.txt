@@ -1,7 +1,0 @@
-E:\temp\DirectX12Leaning-afd0d5642226d9f6a32c3d05f3a3fd5bd30430cf\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
-E:\temp\DirectX12Leaning-afd0d5642226d9f6a32c3d05f3a3fd5bd30430cf\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.pdb
-F:\temp\DirectX12Leaning-afd0d5642226d9f6a32c3d05f3a3fd5bd30430cf\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
-E:\temp\DirectX12Leaning\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
-E:\temp\DirectX12Leaning\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.pdb
-E:\Dev\GitHub\DirectX12Leaning\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
-E:\Dev\GitHub\DirectX12Leaning\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.pdb

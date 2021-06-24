@@ -1,0 +1,35 @@
+﻿  compilation object save succeeded; see C:\Users\hato1\Desktop\DirectX12Leaning\x64\Debug\BasicPS.cso
+  compilation object save succeeded; see C:\Users\hato1\Desktop\DirectX12Leaning\x64\Debug\BasicPS3D.cso
+  compilation object save succeeded; see C:\Users\hato1\Desktop\DirectX12Leaning\x64\Debug\BasicVS.cso
+  compilation object save succeeded; see C:\Users\hato1\Desktop\DirectX12Leaning\x64\Debug\BasicVS3D.cso
+  DirectX12.cpp
+C:\Users\hato1\Desktop\DirectX12Leaning\DirectX12.cpp(181,19): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
+C:\Users\hato1\Desktop\DirectX12Leaning\DirectX12.cpp(182,20): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
+  Draw2D.cpp
+C:\Users\hato1\Desktop\DirectX12Leaning\Draw2D.cpp(109,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\hato1\Desktop\DirectX12Leaning\Draw2D.cpp(164,66): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+C:\Users\hato1\Desktop\DirectX12Leaning\Draw2D.cpp(171,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\hato1\Desktop\DirectX12Leaning\Draw2D.cpp(229,62): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+  Draw3D.cpp
+C:\Users\hato1\Desktop\DirectX12Leaning\Draw3D.cpp(132,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\hato1\Desktop\DirectX12Leaning\Draw3D.cpp(192,57): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+C:\Users\hato1\Desktop\DirectX12Leaning\Draw3D.cpp(259,62): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+  DrawUtility.cpp
+C:\Users\hato1\Desktop\DirectX12Leaning\DrawUtility.h(30,2): warning C4091: 'typedef ': ignored on left of 'DrawTriangularPyramidObjData3D' when no variable is declared
+C:\Users\hato1\Desktop\DirectX12Leaning\DrawUtility.h(35,2): warning C4091: 'typedef ': ignored on left of 'DrawBoxObjData3D' when no variable is declared
+C:\Users\hato1\Desktop\DirectX12Leaning\DrawUtility.h(40,2): warning C4091: 'typedef ': ignored on left of 'DrawCircleData2D' when no variable is declared
+C:\Users\hato1\Desktop\DirectX12Leaning\DrawUtility.h(45,2): warning C4091: 'typedef ': ignored on left of 'DrawBoxData2D' when no variable is declared
+  Input.cpp
+  main.cpp
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
+C:\Users\hato1\Desktop\DirectX12Leaning\main.cpp(5,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\hato1\Desktop\DirectX12Leaning\main.cpp(35,30): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\hato1\Desktop\DirectX12Leaning\main.cpp(36,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  PlayerOP.cpp
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
+  tempUtility.cpp
+  Win32.cpp
+C:\Users\hato1\Desktop\DirectX12Leaning\Win32.cpp(26,21): warning C4838: conversion from 'const unsigned int' to 'LONG' requires a narrowing conversion
+C:\Users\hato1\Desktop\DirectX12Leaning\Win32.cpp(26,36): warning C4838: conversion from 'const unsigned int' to 'LONG' requires a narrowing conversion
+  Generating Code...
+  DirectX12Leaning.vcxproj -> C:\Users\hato1\Desktop\DirectX12Leaning\x64\Debug\DirectX12Leaning.exe

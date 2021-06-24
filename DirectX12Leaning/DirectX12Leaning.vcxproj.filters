@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Win32">
+      <UniqueIdentifier>{d3646195-517b-45c7-b239-36a2ebe01a80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX12">
+      <UniqueIdentifier>{ed441cd7-e79a-41ad-907c-8ba7a5e51abb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX12\Draw">
+      <UniqueIdentifier>{e4a212c6-434e-4284-8da1-52ee7fb0e26d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX12\Draw\2D">
+      <UniqueIdentifier>{edb24494-cd6b-4a97-89b1-edbc29151f04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX12\Draw\3D">
+      <UniqueIdentifier>{a18e920f-8feb-4223-9004-ad5883f3bec2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX12\System">
+      <UniqueIdentifier>{24a63b79-29ef-4a92-a752-7c8b33f95d92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{11a63391-6410-4ab6-9ce0-35dc0519c210}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\3D">
+      <UniqueIdentifier>{30a1f6c1-cce8-47ca-8b7a-a851e40ef7bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\2D">
+      <UniqueIdentifier>{2e84b014-3149-406b-a766-d4d3d9c9a178}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Header">
+      <UniqueIdentifier>{996bc6ba-757e-49d7-a678-085eac9c80cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DirectX12\Draw\Utility">
+      <UniqueIdentifier>{90a3dd82-1cea-4dc8-90b0-4dbf0c3bfc22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{78a0d3f9-d370-4524-a885-157a26da7935}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{de148cfd-c1cd-4479-9ea3-562a67714ad9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{6d3c8ab9-6d0b-4e7d-b8ee-688ecf10c22a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\temp">
+      <UniqueIdentifier>{6a53c649-fda8-40c5-af44-ee3bd6082f25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\IO">
+      <UniqueIdentifier>{1fa0fd67-7f67-4206-b80c-9b22f0b516d7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="BasicPS3D.hlsl">
+      <Filter>Shader\3D</Filter>
+    </FxCompile>
+    <FxCompile Include="BasicVS3D.hlsl">
+      <Filter>Shader\3D</Filter>
+    </FxCompile>
+    <FxCompile Include="BasicPS.hlsl">
+      <Filter>Shader\2D</Filter>
+    </FxCompile>
+    <FxCompile Include="BasicVS.hlsl">
+      <Filter>Shader\2D</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Win32.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw2D.cpp">
+      <Filter>DirectX12\Draw\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Draw3D.cpp">
+      <Filter>DirectX12\Draw\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectX12.cpp">
+      <Filter>DirectX12\System</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawUtility.cpp">
+      <Filter>DirectX12\Draw\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerOP.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="tempUtility.cpp">
+      <Filter>Utility\temp</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Utility\IO</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Win32.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw2D.h">
+      <Filter>DirectX12\Draw\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Draw3D.h">
+      <Filter>DirectX12\Draw\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectX12.h">
+      <Filter>DirectX12\System</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawUtility.h">
+      <Filter>DirectX12\Draw\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="includes.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerOP.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="tempUtility.h">
+      <Filter>Utility\temp</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Utility\IO</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Basic.hlsli">
+      <Filter>Shader\Header</Filter>
+    </None>
+  </ItemGroup>
+</Project>
