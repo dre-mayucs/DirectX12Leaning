@@ -48,10 +48,8 @@
 #pragma comment(lib, "dxgi.lib")
 
 //STL
-#include <ctime>
 #include <vector>
-#include <string>
-#include <assert.h>
+#include <ctime>
 
 //Utility
 #include "Input.h"
