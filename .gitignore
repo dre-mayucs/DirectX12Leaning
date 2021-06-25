@@ -1,4 +1,5 @@
-*.suo
-*.db*
-*.ipch
-*.log
+!*.cpp
+!*.h
+!*.hpp
+!*.txt
+!*.md
