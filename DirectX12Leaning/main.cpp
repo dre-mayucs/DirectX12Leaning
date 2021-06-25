@@ -9,18 +9,18 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	//Initialize
 	Win32		win32(L"Test", window_width, window_height);
 	Input		*input = new Input(win32.GetWindowClass(), win32.GetHandleWindow());
-	DirectX12	dx12(win32.GetHandleWindow(), window_width, window_height);
+	DirectX12	dx12(win32.GetHandleWindow(), window_width, window_height, SelectVSYNC::EnableVSYNC);
 
 	dx12.Initialize_components();
 	ID3D12Device *dev = dx12.GetDevice();
 	ID3D12GraphicsCommandList *cmdList = dx12.GetCommandList();
 
 	//PLayer
-	Draw3D drawPlayer(3, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	Draw3D drawPlayer(DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
 	PlayerOP player(0, 0, 0, 5, input);
 
 	//DrawObject
-	Draw3D enemyObject( 3, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	Draw3D enemyObject(DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
 	DirectX::XMFLOAT4 enemyColor = dx12.GetColor(255, 0, 0, 255);
 	Position3D enemyPos = {-20, 0, 0};
 

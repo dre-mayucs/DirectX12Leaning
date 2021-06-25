@@ -12,10 +12,10 @@
 
 //Utility
 #include "tempUtility.h"
+#include "DrawUtility.h"
 #include "Draw3D.h"
 
-Draw3D::Draw3D(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
-	shapeSize(shapeSize),
+Draw3D::Draw3D(DrawShapeData shapeData, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
 	radius(radius),
 	dev(dev),
 	cmdList(cmdList),
@@ -23,13 +23,12 @@ Draw3D::Draw3D(const unsigned int shapeSize, const float radius, const int fillM
 	window_width(window_width),
 	window_height(window_height)
 {
-	SetVertices();
+	SetShape(shapeData);
 	SetHeapProperty();
 	SetResourceDescription();
 	CreateVertexBuffer();
 	GetVertexMapVirtualMemory();
 	SetVertexBufferView();
-	SetIndices();
 	SetIndexBuffer();
 	GetIndexMapVirtualMemory();
 	SetIndexBufferView();
@@ -126,23 +125,39 @@ void Draw3D::execute(const DirectX::XMFLOAT4 color, const DirectX::XMMATRIX Tran
 	cmdList->DrawIndexedInstanced((int)indices.size(), 1, 0, 0, 0);
 }
 
-void Draw3D::SetVertices()
+void Draw3D::SetShape(DrawShapeData shapeData)
 {
-	vertices = std::vector<Vertex3D>(shapeSize + 2);
-	for (auto i = 0; i < shapeSize; ++i) {
-		vertices[i] = {
-			{
-				(float)radius * sinf(DirectX::XM_2PI / shapeSize * i),
-				(float)radius * cosf(DirectX::XM_2PI / shapeSize * i),
-				0.f,
-			},
-			{ },
-			{ 0.0f, 0.0f }
-		};
+	switch (shapeData)
+	{
+		case DrawShapeData::TriangularPyramid:
+		{
+			DrawTriangularPyramidObjData3D spriteData;
+
+			//SetVertex
+			vertices = std::vector<Vertex3D>(spriteData.VertexSize);
+
+			for (auto i = 0; i < spriteData.VertexSize; i++) {
+				vertices[i] = spriteData.vertices[i];
+
+				vertices[i].pos.x *= radius;
+				vertices[i].pos.y *= radius;
+			}
+			sizeVB = static_cast<UINT>(sizeof(Vertex3D) * vertices.size());
+
+			//SetIndex
+			indices = std::vector<unsigned short>(spriteData.IndexSize);
+			for (auto i = 0; i < spriteData.IndexSize; i++) {
+				indices[i] = spriteData.indices[i];
+			}
+			break;
+		}
+
+		case DrawShapeData::Box:
+		{
+			//null
+			break;
+		}
 	}
-	vertices[shapeSize] = { {0.0f, 0.0f, 0.0f }, {}, { 0.0f, 0.0f } };
-	vertices[shapeSize + 1] = { {0.0f, 0.0f, -radius }, {}, { 0.0f, 0.0f } };
-	sizeVB = static_cast<UINT>(sizeof(Vertex3D) * vertices.size());
 }
 
 void Draw3D::SetHeapProperty()
@@ -193,19 +208,6 @@ void Draw3D::SetVertexBufferView()
 	vbView.StrideInBytes = sizeof(Vertex3D);
 }
 
-void Draw3D::SetIndices()
-{
-	indices = std::vector<unsigned short>(18) = 
-	{
-		1, 0, 3,
-		2, 1, 3,
-		0, 2, 3,
-		0, 1, 4,
-		1, 2, 4,
-		2, 0, 4
-	};
-}
-
 void Draw3D::SetIndexBuffer()
 {
 	//Add index buffer
@@ -242,11 +244,6 @@ void Draw3D::GetVertexMapVirtualMemory()
 	assert(result == S_OK);
 
 	std::copy(vertices.begin(), vertices.end(), vertMap);
-	/*for (auto i = 0; i < vertices.size(); ++i) {
-		vertMap[i].normal = vertices[i].normal;
-		vertMap[i].pos = vertices[i].pos;
-		vertMap[i].uv = vertices[i].uv;
-	}*/
 	verBuff->Unmap(0, nullptr);
 }
 

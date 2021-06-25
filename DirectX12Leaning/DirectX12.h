@@ -1,9 +1,14 @@
 #pragma once
+enum class SelectVSYNC {
+	DisableVSYNC,
+	EnableVSYNC
+};
+
 class DirectX12
 {
 public: //Public function
 	//Initialize
-	DirectX12(HWND hwnd, const int window_width, const int window_height);
+	DirectX12(HWND hwnd, const int window_width, const int window_height, SelectVSYNC vsync = SelectVSYNC::EnableVSYNC);
 	void Initialize_components();
 
 	//color getter
@@ -54,6 +59,7 @@ private:
 	HWND hwnd;
 	int window_width;
 	int window_height;
+	int VSYNCMode;
 
 	//GPU
 	std::vector<IDXGIAdapter1 *> adapters;

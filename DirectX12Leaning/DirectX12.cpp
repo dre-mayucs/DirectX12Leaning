@@ -22,7 +22,7 @@
 //this me
 #include "DirectX12.h"
 
-DirectX12::DirectX12(HWND hwnd, const int window_width, const int window_height) : hwnd(hwnd), window_width(window_width), window_height(window_height)
+DirectX12::DirectX12(HWND hwnd, const int window_width, const int window_height, SelectVSYNC vsync) : hwnd(hwnd), window_width(window_width), window_height(window_height), VSYNCMode((int)vsync)
 {
 	//GPU
 	result = S_FALSE;
@@ -166,7 +166,7 @@ void DirectX12::ScreenFlip()
 
 	cmdAllocator->Reset();
 	cmdList->Reset(cmdAllocator, nullptr);
-	swapchain->Present(1, 0);
+	swapchain->Present(VSYNCMode, 0);
 }
 
 void DirectX12::RestoreResourceBarrierSetting()
@@ -186,7 +186,6 @@ void DirectX12::SetScissorrect()
 	viewport.MaxDepth = 1.f;
 
 	cmdList->RSSetViewports(1, &viewport);
-	
 }
 
 void DirectX12::SetViewport()

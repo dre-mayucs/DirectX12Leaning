@@ -1,5 +1,11 @@
 #pragma once
 #include <DirectXTex.h>
+
+enum class DrawShapeData {
+	TriangularPyramid,
+	Box
+};
+
 class Draw3D
 {
 private:
@@ -7,18 +13,19 @@ private:
 	int window_height;
 
 public:
-	Draw3D(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
+	Draw3D(DrawShapeData shapeData, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
 	void execute(const DirectX::XMFLOAT4 color, const DirectX::XMMATRIX Translation);
 	void SetPos(const DirectX::XMFLOAT3 pos);
 
 private:
+	void SetShape(DrawShapeData shapeData);
+	void ChangeShapeSize();
 	void SetVertices();
 	void SetHeapProperty();
 	void SetResourceDescription();
 	void CreateVertexBuffer();
 	void GetVertexMapVirtualMemory();
 	void SetVertexBufferView();
-	void SetIndices();
 	void SetIndexBuffer();
 	void GetIndexMapVirtualMemory();
 	void SetIndexBufferView();
@@ -41,9 +48,8 @@ private:
 	void SetRootSignature();
 	void SetSignature();
 
-public:
+private:
 	float radius;
-	unsigned int shapeSize;
 
 	std::vector<unsigned short>indices;
 	std::vector<Vertex3D>vertices;
@@ -54,7 +60,7 @@ public:
 	ID3D12Device *dev;
 	ID3D12GraphicsCommandList *cmdList;
 
-public:
+private:
 	D3D12_HEAP_PROPERTIES heapprop;
 	D3D12_RESOURCE_DESC resdesc;
 	ID3D12Resource *verBuff;

@@ -1,24 +1,20 @@
 #pragma once
 
-class SetDrawData
+struct DrawTriangularPyramidObjData3D
 {
-public:
-	void SetDrawTriangularPyramidObjVertexData3D(Vertex3D *vertices);
-	Vertex3D *SetDrawTriangularPyramidObjIndexData3D();
-	Vertex3D *SetDrawBoxObjVertexData3D();
-	Vertex3D *SetDrawBoxObjIndexData3D();
+	const int VertexSize = 5;
+	const int IndexSize = 18;
 
-	Vertex *SetDrawCircleVertexData2D();
-	Vertex *SetDrawCircleIndexData2D();
-	Vertex *SetDrawBoxVertexData2D();
-	Vertex *SetDrawBoxIndexData2D();
-};
+	Vertex3D vertices[5] =
+	{
+		{ {		  0.0f,	 1.0f,  0.0f }, {}, { 0.0f, 0.0f } },
+		{ {  0.866025f, -0.5f,  0.0f }, {}, { 0.0f, 0.0f } },
+		{ { -0.866025f, -0.5f,  0.0f }, {}, { 0.0f, 0.0f } },
+		{ {       0.0f,  0.0f,  0.0f }, {}, { 0.0f, 0.0f } },
+		{ {       0.0f,  0.0f, -1.0f }, {}, { 0.0f, 0.0f } }
+	};
 
-typedef struct DrawTriangularPyramidObjData3D
-{
-	Vertex3D vertices[5];
-
-	unsigned short indices[18] = 
+	unsigned short indices[18] =
 	{
 		1, 0, 3,
 		2, 1, 3,
@@ -29,17 +25,17 @@ typedef struct DrawTriangularPyramidObjData3D
 	};
 };
 
-typedef struct DrawBoxObjData3D
+struct DrawBoxObjData3D
 {
 
 };
 
-typedef struct DrawCircleData2D
+struct DrawCircleData2D
 {
 
 };
 
-typedef struct DrawBoxData2D
+struct DrawBoxData2D
 {
 
 };
