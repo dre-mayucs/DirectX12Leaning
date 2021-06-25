@@ -110,6 +110,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (!win32.ProcessMessage()) { break; }
 		if (input->GetKeyDown(DIK_ESCAPE)) { break; }
 	}
+	delete input;
 	return 0;
 }
 ```  
