@@ -23,10 +23,10 @@ PlayerOP::PlayerOP(float x, float y, float z, float r, Input *input) : input(inp
 
 void PlayerOP::Update()
 {
-	if (input->GetKey(DIK_W) || input->GetKey(DIK_UP))		{ position.y += 1.f; }
-	if (input->GetKey(DIK_S) || input->GetKey(DIK_DOWN))	{ position.y -= 1.f; }
-	if (input->GetKey(DIK_A) || input->GetKey(DIK_LEFT))	{ position.x -= 1.f; }
-	if (input->GetKey(DIK_D) || input->GetKey(DIK_RIGHT))	{ position.x += 1.f; }
+	if (position.y <  25 && input->GetKey(DIK_W) || input->GetKey(DIK_UP))		{ position.y += 1.f; }
+	if (position.y > -25 && input->GetKey(DIK_S) || input->GetKey(DIK_DOWN))	{ position.y -= 1.f; }
+	if (position.x > -50 && input->GetKey(DIK_A) || input->GetKey(DIK_LEFT))	{ position.x -= 1.f; }
+	if (position.x <  50 && input->GetKey(DIK_D) || input->GetKey(DIK_RIGHT))	{ position.x += 1.f; }
 
 	matrixTranslation = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 }

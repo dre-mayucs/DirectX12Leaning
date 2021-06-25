@@ -17,6 +17,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	//PLayer
 	Draw3D drawPlayer(DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	drawPlayer.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
 	PlayerOP player(0, 0, 0, 5, input);
 
 	//DrawObject

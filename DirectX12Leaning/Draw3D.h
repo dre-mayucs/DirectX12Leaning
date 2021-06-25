@@ -15,7 +15,7 @@ private:
 public:
 	Draw3D(DrawShapeData shapeData, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
 	void execute(const DirectX::XMFLOAT4 color, const DirectX::XMMATRIX Translation);
-	void SetPos(const DirectX::XMFLOAT3 pos);
+	void SetRotation(DirectX::XMMATRIX Rotation);
 
 private:
 	void SetShape(DrawShapeData shapeData);

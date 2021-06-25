@@ -79,8 +79,8 @@ void Draw3D::execute(const DirectX::XMFLOAT4 color, const DirectX::XMMATRIX Tran
 	std::copy(vertices.begin(), vertices.end(), vertMap);
 	verBuff->Unmap(0, nullptr);
 
-	//matRot = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(1.0f)) * DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(1.0f));
 	matTrans = Translation;
+
 	matWorld = DirectX::XMMatrixIdentity();
 	matWorld *= matScale;
 	matWorld *= matRot;
@@ -123,6 +123,11 @@ void Draw3D::execute(const DirectX::XMFLOAT4 color, const DirectX::XMMATRIX Tran
 	//Index buffer set command
 	cmdList->IASetIndexBuffer(&ibView);
 	cmdList->DrawIndexedInstanced((int)indices.size(), 1, 0, 0, 0);
+}
+
+void Draw3D::SetRotation(DirectX::XMMATRIX Rotation)
+{
+	matRot *= Rotation;
 }
 
 void Draw3D::SetShape(DrawShapeData shapeData)
