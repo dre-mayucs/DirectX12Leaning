@@ -6,6 +6,7 @@ public:
 	void Update();
 	bool GetCollition(Position3D targetPos, float targetRadius) const;
 	const DirectX::XMMATRIX GetPlayerPositionMatrix() const;
+	DirectX::XMFLOAT2 GetPosition() const;
 
 private:
 	Input *input;

@@ -46,3 +46,8 @@ const DirectX::XMMATRIX PlayerOP::GetPlayerPositionMatrix() const
 {
 	return matrixTranslation;
 }
+
+DirectX::XMFLOAT2 PlayerOP::GetPosition() const
+{
+	return DirectX::XMFLOAT2(position.x, position.y);
+}
