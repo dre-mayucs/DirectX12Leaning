@@ -4,9 +4,12 @@ class PlayerOP
 public:
 	PlayerOP(float x, float y, float z, float r, Input *input);
 	void Update();
-	bool GetCollition(Position3D targetPos, float targetRadius) const;
 	const DirectX::XMMATRIX GetPlayerPositionMatrix() const;
 	DirectX::XMFLOAT2 GetPosition() const;
+	Position3D Get3DPoint() const;
+
+private:
+	bool GetCollition(Position3D targetPos, float targetRadius) const;
 
 private:
 	Input *input;

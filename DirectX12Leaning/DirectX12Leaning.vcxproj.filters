@@ -49,6 +49,12 @@
     <Filter Include="Utility\IO">
       <UniqueIdentifier>{1fa0fd67-7f67-4206-b80c-9b22f0b516d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Player\Bullet">
+      <UniqueIdentifier>{dfd16ffe-c2b1-4b6b-a938-13a58e836f95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player\Player">
+      <UniqueIdentifier>{e5179460-7017-462e-b7f9-dd27fdffd82d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BasicPS3D.hlsl">
@@ -83,14 +89,17 @@
     <ClCompile Include="main.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerOP.cpp">
-      <Filter>Player</Filter>
-    </ClCompile>
     <ClCompile Include="tempUtility.cpp">
       <Filter>Utility\temp</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Utility\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerOP.cpp">
+      <Filter>Player\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Player\Bullet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -112,14 +121,17 @@
     <ClInclude Include="includes.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerOP.h">
-      <Filter>Player</Filter>
-    </ClInclude>
     <ClInclude Include="tempUtility.h">
       <Filter>Utility\temp</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Utility\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerOP.h">
+      <Filter>Player\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>Player\Bullet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

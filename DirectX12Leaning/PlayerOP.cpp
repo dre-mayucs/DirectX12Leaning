@@ -3,7 +3,6 @@
 #include <dinput.h>
 
 //Utility
-#include <cmath>
 #include "Input.h"
 #include "TempUtility.h"
 
@@ -50,4 +49,9 @@ const DirectX::XMMATRIX PlayerOP::GetPlayerPositionMatrix() const
 DirectX::XMFLOAT2 PlayerOP::GetPosition() const
 {
 	return DirectX::XMFLOAT2(position.x, position.y);
+}
+
+Position3D PlayerOP::Get3DPoint() const
+{
+	return position;
 }

@@ -21,10 +21,9 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	PlayerOP player(0, 0, 0, 5, input);
 
 	//Projectile
-	bool activeFlag = false;
-	DirectX::XMFLOAT2 BulletPos = { 0, 0 };
-	Draw3D Bullet(DrawShapeData::TriangularPyramid, 3, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
-	Bullet.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
+	Draw3D DrawBullet(DrawShapeData::TriangularPyramid, 3, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	DrawBullet.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
+	Bullet bullet(1.0f, 3, input);
 
 	//DrawObject
 	Draw3D enemyObject(DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
@@ -37,30 +36,19 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		dx12.ClearDrawScreen(dx12.GetColor(100, 200, 255, 255));
 
 		player.Update();
+		bullet.Update(player.Get3DPoint());
 
-		if (player.GetCollition(enemyPos, 5)) {
+		if (bullet.GetCollision(enemyPos, 5)) {
 			enemyPos.x = rand() % 100 - 50;
 			enemyPos.y = rand() % 50 - 25;
-		}
-
-		if (input->GetKeyDown(DIK_SPACE) && activeFlag == false) {
-			BulletPos = player.GetPosition();
-			activeFlag = true;
-		}
-
-		if (activeFlag == true) {
-			BulletPos.x += 1.f;
-
-			if (BulletPos.x >= 60.0f) {
-				activeFlag = false;
-			}
+			bullet.SetActiveFlag(false);
 		}
 
 		drawPlayer.execute(dx12.GetColor(255, 255, 255, 255), player.GetPlayerPositionMatrix());
 		enemyObject.execute(enemyColor, DirectX::XMMatrixTranslation(enemyPos.x, enemyPos.y, enemyPos.z));
 
-		if (activeFlag == true) {
-			Bullet.execute(dx12.GetColor(255, 255, 255, 255), DirectX::XMMatrixTranslation(BulletPos.x, BulletPos.y, 0));
+		if (bullet.GetActiveFlag()) {
+			DrawBullet.execute(dx12.GetColor(255, 255, 255, 255), bullet.GetBulletPositionMatrix());
 		}
 
 		dx12.ScreenFlip();
