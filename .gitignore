@@ -1,0 +1,4 @@
+*.suo
+*.db*
+*.ipch
+*.log
