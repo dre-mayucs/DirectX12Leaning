@@ -47,10 +47,6 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 
-//shader(HLSL)
-#include <d3dcompiler.h>
-#pragma comment(lib, "d3dcompiler.lib")
-
 //STL
 #include <ctime>
 #include <vector>
@@ -58,7 +54,6 @@
 #include <assert.h>
 
 //Utility
-#include <dinput.h>
 #include "Input.h"
 #include "Win32.h"
 #include "tempUtility.h"
@@ -66,6 +61,7 @@
 #include "PlayerOP.h"
 #include "Draw2D.h"
 #include "Draw3D.h"
+#include "Bullet.h"
 
 int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) 
 {
@@ -108,7 +104,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		dx12.ScreenFlip();
 		if (!win32.ProcessMessage()) { break; }
-		if (input->GetKeyDown(DIK_ESCAPE)) { break; }
+		if (input->GetKeyDown(keycode::Escape)) { break; }
 	}
 	delete input;
 	return 0;
