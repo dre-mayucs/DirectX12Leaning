@@ -7,3 +7,4 @@ E:\Dev\GitHub\DirectX12Leaning\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Deb
 E:\Dev\GitHub\DirectX12Leaning\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.pdb
 F:\Dev\GitHub\DirectX12Leaning\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
 C:\Users\hato1\Desktop\DirectX12Leaning\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug\DirectXTex.lib

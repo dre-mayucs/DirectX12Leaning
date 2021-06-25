@@ -1,6 +1,5 @@
 //DirectX12
 #include <DirectXMath.h>
-#include <dinput.h>
 
 //Utility
 #include "Input.h"
@@ -22,10 +21,10 @@ PlayerOP::PlayerOP(float x, float y, float z, float r, Input *input) : input(inp
 
 void PlayerOP::Update()
 {
-	if (position.y <  25 && input->GetKey(DIK_W) || input->GetKey(DIK_UP))		{ position.y += 1.f; }
-	if (position.y > -25 && input->GetKey(DIK_S) || input->GetKey(DIK_DOWN))	{ position.y -= 1.f; }
-	if (position.x > -50 && input->GetKey(DIK_A) || input->GetKey(DIK_LEFT))	{ position.x -= 1.f; }
-	if (position.x <  50 && input->GetKey(DIK_D) || input->GetKey(DIK_RIGHT))	{ position.x += 1.f; }
+	if (position.y <  25 && input->GetKey(keycode::W) || input->GetKey(keycode::UpArrow))		{ position.y += 1.f; }
+	if (position.y > -25 && input->GetKey(keycode::S) || input->GetKey(keycode::DownAllow))		{ position.y -= 1.f; }
+	if (position.x > -50 && input->GetKey(keycode::A) || input->GetKey(keycode::LeftArrow))		{ position.x -= 1.f; }
+	if (position.x <  50 && input->GetKey(keycode::D) || input->GetKey(keycode::RightArrow))	{ position.x += 1.f; }
 
 	matrixTranslation = DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 }

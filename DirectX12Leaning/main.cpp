@@ -32,6 +32,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	while (true)
 	{
+		//Update process
 		input->Update();
 		dx12.ClearDrawScreen(dx12.GetColor(100, 200, 255, 255));
 
@@ -44,6 +45,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 			bullet.SetActiveFlag(false);
 		}
 
+		//Draw process
 		drawPlayer.execute(dx12.GetColor(255, 255, 255, 255), player.GetPlayerPositionMatrix());
 		enemyObject.execute(enemyColor, DirectX::XMMatrixTranslation(enemyPos.x, enemyPos.y, enemyPos.z));
 
@@ -53,7 +55,9 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		dx12.ScreenFlip();
 		if (!win32.ProcessMessage()) { break; }
-		if (input->GetKeyDown(DIK_ESCAPE)) { break; }
+		if (input->GetKeyDown(keycode::Escape)) { break; }
 	}
+
+	delete input;
 	return 0;
 }

@@ -1,12 +1,6 @@
 //API(Win32)
 #include <Windows.h>
 
-//API(IO)
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
-
 #include "Input.h"
 
 Input::Input(const WNDCLASSEX &w, const HWND &hwnd)
@@ -51,17 +45,17 @@ HRESULT Input::Update()
 	return result;
 }
 
-bool Input::GetKey(const int KeyCode)
+bool Input::GetKey(keycode KeyCode)
 {
-	return latest_Key[KeyCode];
+	return latest_Key[static_cast<int>(KeyCode)];
 }
 
-bool Input::GetKeyDown(const int KeyCode)
+bool Input::GetKeyDown(keycode KeyCode)
 {
-	return !(old_Key[KeyCode]) && latest_Key[KeyCode];
+	return !(old_Key[static_cast<int>(KeyCode)]) && latest_Key[static_cast<int>(KeyCode)];
 }
 
-bool Input::GetKeyUp(const int KeyCode)
+bool Input::GetKeyUp(keycode KeyCode)
 {
-	return old_Key[KeyCode] && !(latest_Key[KeyCode]);
+	return old_Key[static_cast<int>(KeyCode)] && !(latest_Key[static_cast<int>(KeyCode)]);
 }

@@ -2,21 +2,21 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\hato1\Desktop\DirectX12Leaning\x64\Release\DirectX12Leaning.exe</FullPath>
+      <FullPath>F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\DirectX12Leaning.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles>
     <ContentFile>
-      <FullPath>C:\Users\hato1\Desktop\DirectX12Leaning\x64\Release\BasicPS.cso</FullPath>
+      <FullPath>F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\BasicPS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\hato1\Desktop\DirectX12Leaning\x64\Release\BasicPS3D.cso</FullPath>
+      <FullPath>F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\BasicPS3D.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\hato1\Desktop\DirectX12Leaning\x64\Release\BasicVS.cso</FullPath>
+      <FullPath>F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\BasicVS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\hato1\Desktop\DirectX12Leaning\x64\Release\BasicVS3D.cso</FullPath>
+      <FullPath>F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\BasicVS3D.cso</FullPath>
     </ContentFile>
   </ContentFiles>
   <SatelliteDlls />

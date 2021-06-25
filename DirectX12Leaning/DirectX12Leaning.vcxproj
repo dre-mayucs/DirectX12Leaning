@@ -166,6 +166,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="DirectX12.cpp" />
     <ClCompile Include="Draw2D.cpp" />
     <ClCompile Include="Draw3D.cpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="Win32.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bullet.h" />
     <ClInclude Include="DirectX12.h" />
     <ClInclude Include="Draw2D.h" />
     <ClInclude Include="Draw3D.h" />

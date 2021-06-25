@@ -1,6 +1,5 @@
 //DirectX
 #include <DirectXMath.h>
-#include <dinput.h>
 
 //Utility
 #include "Input.h"
@@ -16,7 +15,7 @@ Bullet::Bullet(float speed, float radius, Input *input) : speed(speed), radius(r
 
 void Bullet::Update(Position3D playerPos)
 {
-	if (input->GetKeyDown(DIK_SPACE) && flag == false) {
+	if (input->GetKeyDown(keycode::Space) && flag == false) {
 		position = playerPos;
 		flag = true;
 	}

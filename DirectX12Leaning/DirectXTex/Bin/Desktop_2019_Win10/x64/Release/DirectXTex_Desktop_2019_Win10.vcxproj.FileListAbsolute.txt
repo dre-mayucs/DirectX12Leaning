@@ -1,2 +1,3 @@
 F:\Dev\GitHub\DirectX12Leaning\DxLearn\DirectXTex\Bin\Desktop_2019_Win10\x64\Release\DirectXTex.lib
 C:\Users\hato1\Desktop\DirectX12Leaning\DirectXTex\Bin\Desktop_2019_Win10\x64\Release\DirectXTex.lib
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\DirectXTex\Bin\Desktop_2019_Win10\x64\Release\DirectXTex.lib

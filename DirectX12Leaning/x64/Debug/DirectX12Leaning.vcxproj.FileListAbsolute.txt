@@ -1,1 +1,2 @@
 C:\Users\hato1\Desktop\DirectX12Leaning\x64\Debug\DirectX12Leaning.exe
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Debug\DirectX12Leaning.exe
