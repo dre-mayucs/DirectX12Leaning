@@ -4,7 +4,7 @@
 ![Type](https://img.shields.io/badge/Type-Desktop-blue?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20x64-blue?style=flat-square)
 # DirectX12Leaning
-※これは僕の学習用に開発している描画エンジン/ライブラリであり、実務用途での使用を想定していません。
+※これは僕が学習用に開発している描画エンジン/ライブラリであり、実務用途での使用を想定していません。
 
 ## 注意
 ***このプロジェクトをクローン/ダウンロードして実行ができない場合このような原因が挙げられます***  
