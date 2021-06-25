@@ -4,13 +4,26 @@
 ![Type](https://img.shields.io/badge/Type-Desktop-blue?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20x64-blue?style=flat-square)
 # DirectX12Leaning
-※これは僕が学習用に開発している描画エンジン/ライブラリであり、実務用途での使用を想定していません。
+※これは僕が学習用に開発している描画エンジン/ライブラリであり、実務用途での使用を想定していません。  
+※以下の環境は必須環境です。  
+※サンプルコードが実行できない場合は設定があっているか、以下の注意に当てはまっていないか確認してください。
+
+## 環境
+| 種類 | 条件 |
+|:---:|:---:|
+|API|DirectX12|
+|OS|Windows10 64bit|
+|CPU|64bit対応のCPU|
+|GPU|DirectX12対応のグラフィックスカード|
 
 ## 注意
 ***このプロジェクトをクローン/ダウンロードして実行ができない場合このような原因が挙げられます***  
 
 ・**プロジェクトのフィルタにコードが含まれていない**  
 　　　→VS2019以降で開きプロジェクトを右クリック -> 追加から既存の項目で含まれていないコードを追加してください    
+
+・**オンボードGPUで実行している**  
+　　　→DirectX12.cpp -> D3D12SelectGPUのNegative keywordsを書きかえてください   
    
 ・**DirectX12がPCに対応していない**  
 　　　→対応したOS/ハードウェアで実行してください  
