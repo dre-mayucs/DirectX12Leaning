@@ -30,7 +30,7 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	//DirectX::XMFLOAT4 enemyColor = dx12.GetColor(255, 0, 0, 255);
 	//Position3D enemyPos = {-20, 0, 0};
 
-	Draw2DGraph graph(4, 1, D3D12_FILL_MODE_SOLID, dev, cmdList, 1920, 1080);
+	Draw2DGraph graph(L"Resources/LOGO_SS.png", D3D12_FILL_MODE_SOLID, dev, cmdList, 1920, 1080);
 
 	while (true)
 	{

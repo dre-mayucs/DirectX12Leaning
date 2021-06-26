@@ -7,7 +7,7 @@ private:
 	int window_height;
 
 public:
-	Draw2DGraph(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
+	Draw2DGraph(const wchar_t *fileName, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
 	void execute(const DirectX::XMFLOAT4 color);
 	void SetPos(const DirectX::XMFLOAT3 pos);
 
@@ -27,7 +27,7 @@ private:
 	void SetConstantBufferResourceDescription();
 	void SetDescripterHeap();
 	void CreateConstantBuffer();
-	void CreateTextureData();
+	void CreateTextureData(const wchar_t *fileName);
 	void SetGraphicsPipeLine(const int fillMode);
 	void SetRenderTargetBlendDescription();
 	void SetRootParameter();
@@ -35,9 +35,6 @@ private:
 	void SetSignature();
 
 private:
-	float radius;
-	unsigned int shapeSize;
-
 	std::vector<unsigned short>indices;
 	std::vector<Graph2DVertex>vertices;
 

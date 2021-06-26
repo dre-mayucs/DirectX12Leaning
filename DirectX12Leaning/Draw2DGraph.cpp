@@ -16,9 +16,7 @@
 //this
 #include "Draw2DGraph.h"
 
-Draw2DGraph::Draw2DGraph(const unsigned int shapeSize, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
-	shapeSize(shapeSize),
-	radius(radius),
+Draw2DGraph::Draw2DGraph(const wchar_t *fileName, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
 	dev(dev),
 	cmdList(cmdList),
 	window_width(window_width),
@@ -39,7 +37,7 @@ Draw2DGraph::Draw2DGraph(const unsigned int shapeSize, const float radius, const
 	SetConstantBufferResourceDescription();
 	SetDescripterHeap();
 	CreateConstantBuffer();
-	CreateTextureData();
+	CreateTextureData(fileName);
 
 	//Top layout
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -300,10 +298,10 @@ void Draw2DGraph::CreateConstantBuffer()
 	this->dev->CreateConstantBufferView(&cbvDesc, basicHeapHandle);
 }
 
-void Draw2DGraph::CreateTextureData()
+void Draw2DGraph::CreateTextureData(const wchar_t *fileName)
 {
 	result = LoadFromWICFile(
-		L"Resources/LOGO_SS.png",
+		fileName,
 		DirectX::WIC_FLAGS_NONE,
 		&metadata, scratchImg
 	);
