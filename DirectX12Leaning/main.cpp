@@ -15,43 +15,45 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	ID3D12Device *dev = dx12.GetDevice();
 	ID3D12GraphicsCommandList *cmdList = dx12.GetCommandList();
 
-	//PLayer
-	Draw3D drawPlayer(DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
-	drawPlayer.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
-	PlayerOP player(0, 0, 0, 5, input);
+	////PLayer
+	//Draw3D drawPlayer(DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	//drawPlayer.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
+	//PlayerOP player(0, 0, 0, 5, input);
 
-	//Projectile
-	Draw3D DrawBullet(DrawShapeData::TriangularPyramid, 3, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
-	DrawBullet.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
-	Bullet bullet(1.0f, 3, input);
+	////Projectile
+	//Draw3D DrawBullet(DrawShapeData::TriangularPyramid, 3, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	//DrawBullet.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
+	//Bullet bullet(1.0f, 3, input);
 
-	//DrawObject
-	Draw3D enemyObject(DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
-	DirectX::XMFLOAT4 enemyColor = dx12.GetColor(255, 0, 0, 255);
-	Position3D enemyPos = {-20, 0, 0};
+	////DrawObject
+	//Draw3D enemyObject(DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	//DirectX::XMFLOAT4 enemyColor = dx12.GetColor(255, 0, 0, 255);
+	//Position3D enemyPos = {-20, 0, 0};
+
+	Draw2DGraph graph(4, 1, D3D12_FILL_MODE_SOLID, dev, cmdList, 1920, 1080);
 
 	while (true)
 	{
 		//Update process
 		input->Update();
 		dx12.ClearDrawScreen(dx12.GetColor(100, 200, 255, 255));
+		graph.execute(dx12.GetColor(255, 255, 255, 255));
+		//player.Update();
+		//bullet.Update(player.Get3DPoint());
 
-		player.Update();
-		bullet.Update(player.Get3DPoint());
+		//if (bullet.GetCollision(enemyPos, 5)) {
+		//	enemyPos.x = rand() % 100 - 50;
+		//	enemyPos.y = rand() % 50 - 25;
+		//	bullet.SetActiveFlag(false);
+		//}
 
-		if (bullet.GetCollision(enemyPos, 5)) {
-			enemyPos.x = rand() % 100 - 50;
-			enemyPos.y = rand() % 50 - 25;
-			bullet.SetActiveFlag(false);
-		}
+		////Draw process
+		//drawPlayer.execute(dx12.GetColor(255, 255, 255, 255), player.GetPlayerPositionMatrix());
+		//enemyObject.execute(enemyColor, DirectX::XMMatrixTranslation(enemyPos.x, enemyPos.y, enemyPos.z));
 
-		//Draw process
-		drawPlayer.execute(dx12.GetColor(255, 255, 255, 255), player.GetPlayerPositionMatrix());
-		enemyObject.execute(enemyColor, DirectX::XMMatrixTranslation(enemyPos.x, enemyPos.y, enemyPos.z));
-
-		if (bullet.GetActiveFlag()) {
-			DrawBullet.execute(dx12.GetColor(255, 255, 255, 255), bullet.GetBulletPositionMatrix());
-		}
+		//if (bullet.GetActiveFlag()) {
+		//	DrawBullet.execute(dx12.GetColor(255, 255, 255, 255), bullet.GetBulletPositionMatrix());
+		//}
 
 		dx12.ScreenFlip();
 		if (!win32.ProcessMessage()) { break; }

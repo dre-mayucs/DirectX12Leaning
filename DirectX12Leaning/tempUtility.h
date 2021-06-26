@@ -24,6 +24,12 @@ struct Vertex
 	DirectX::XMFLOAT3 pos;
 };
 
+struct Graph2DVertex
+{
+	DirectX::XMFLOAT3 pos;
+	DirectX::XMFLOAT2 uv;
+};
+
 struct Position3D
 {
 	float x = 0;

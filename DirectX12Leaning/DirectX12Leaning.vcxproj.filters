@@ -55,6 +55,12 @@
     <Filter Include="Player\Player">
       <UniqueIdentifier>{e5179460-7017-462e-b7f9-dd27fdffd82d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DirectX12\Draw\2DGraph">
+      <UniqueIdentifier>{36ce1849-5848-464c-8029-4d43d8ef5a0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\2DGraph">
+      <UniqueIdentifier>{8f7dbd17-dc35-46e1-8e9d-d32a0151981a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BasicPS3D.hlsl">
@@ -68,6 +74,12 @@
     </FxCompile>
     <FxCompile Include="BasicVS.hlsl">
       <Filter>Shader\2D</Filter>
+    </FxCompile>
+    <FxCompile Include="Graph2DPS.hlsl">
+      <Filter>Shader\2DGraph</Filter>
+    </FxCompile>
+    <FxCompile Include="Graph2DVS.hlsl">
+      <Filter>Shader\2DGraph</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +113,9 @@
     <ClCompile Include="Bullet.cpp">
       <Filter>Player\Bullet</Filter>
     </ClCompile>
+    <ClCompile Include="Draw2DGraph.cpp">
+      <Filter>DirectX12\Draw\2DGraph</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Win32.h">
@@ -133,9 +148,15 @@
     <ClInclude Include="Bullet.h">
       <Filter>Player\Bullet</Filter>
     </ClInclude>
+    <ClInclude Include="Draw2DGraph.h">
+      <Filter>DirectX12\Draw\2DGraph</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.hlsli">
+      <Filter>Shader\Header</Filter>
+    </None>
+    <None Include="Graph2DShader.hlsli">
       <Filter>Shader\Header</Filter>
     </None>
   </ItemGroup>

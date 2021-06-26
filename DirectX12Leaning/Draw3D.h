@@ -19,8 +19,8 @@ public:
 
 private:
 	void SetShape(DrawShapeData shapeData);
-	void ChangeShapeSize();
-	void SetVertices();
+	/*void ChangeShapeSize();
+	void SetVertices();*/
 	void SetHeapProperty();
 	void SetResourceDescription();
 	void CreateVertexBuffer();
