@@ -61,11 +61,23 @@ Draw2DGraph::Draw2DGraph(const wchar_t *fileName, const int fillMode, ID3D12Devi
 	SetSignature();
 }
 
-void Draw2DGraph::execute(const DirectX::XMFLOAT4 color)
+void Draw2DGraph::execute(const DirectX::XMFLOAT4 color, const float adjustXPos)
 {
 	//Get VirtualMemory
 	Graph2DVertex *vertMap = nullptr;
 	result = verBuff->Map(0, nullptr, (void **)&vertMap);
+
+	vertices = {
+		{{ -1.f, -1.f, 0.0f},{0.0f, 1.0f}},
+		{{ -1.f, +1.f, 0.0f},{0.0f, 0.0f}},
+		{{ +1.f, -1.f, 0.0f},{1.0f, 1.0f}},
+		{{ +1.f, +1.f, 0.0f},{1.0f, 0.0f}}
+	};
+
+	for (auto &x : vertices) {
+		x.pos.x += adjustXPos;
+	}
+
 	assert(result == S_OK);
 
 	//Update point
@@ -103,10 +115,10 @@ void Draw2DGraph::SetVertices()
 {
 	vertices = std::vector<Graph2DVertex>(4);
 	vertices = {
-		{{-0.4f, -0.7f, 0.0f},{0.0f, 1.0f}},
-		{{-0.4f, +0.7f, 0.0f},{0.0f, 0.0f}},
-		{{+0.4f, -0.7f, 0.0f},{1.0f, 1.0f}},
-		{{+0.4f, +0.7f, 0.0f},{1.0f, 0.0f}}
+		{{ -1.f, -1.f, 0.0f},{0.0f, 1.0f}},
+		{{ -1.f, +1.f, 0.0f},{0.0f, 0.0f}},
+		{{ +1.f, -1.f, 0.0f},{1.0f, 1.0f}},
+		{{ +1.f, +1.f, 0.0f},{1.0f, 0.0f}}
 	};
 	sizeVB = static_cast<UINT>(sizeof(Graph2DVertex) * vertices.size());
 }

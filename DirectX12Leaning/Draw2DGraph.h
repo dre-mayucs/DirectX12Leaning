@@ -8,8 +8,7 @@ private:
 
 public:
 	Draw2DGraph(const wchar_t *fileName, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
-	void execute(const DirectX::XMFLOAT4 color);
-	void SetPos(const DirectX::XMFLOAT3 pos);
+	void execute(const DirectX::XMFLOAT4 color, const float adjustXPos);
 
 private:
 	void SetVertices();

@@ -159,7 +159,24 @@ void Draw3D::SetShape(DrawShapeData shapeData)
 
 		case DrawShapeData::Box:
 		{
-			//null
+			DrawBoxObjData3D spriteData;
+
+			//SetVertex
+			vertices = std::vector<Vertex3D>(spriteData.VertexSize);
+
+			for (auto i = 0; i < spriteData.VertexSize; i++) {
+				vertices[i] = spriteData.vertices[i];
+
+				vertices[i].pos.x *= radius;
+				vertices[i].pos.y *= radius;
+			}
+			sizeVB = static_cast<UINT>(sizeof(Vertex3D) * vertices.size());
+
+			//SetIndex
+			indices = std::vector<unsigned short>(spriteData.IndexSize);
+			for (auto i = 0; i < spriteData.IndexSize; i++) {
+				indices[i] = spriteData.indices[i];
+			}
 			break;
 		}
 	}
@@ -345,7 +362,7 @@ void Draw3D::CreateConstantBuffer()
 void Draw3D::CreateTextureData()
 {
 	result = LoadFromWICFile(
-		L"Resources/LOGO_S.png",
+		L"Resources/LOGO_SS.png",
 		DirectX::WIC_FLAGS_NONE,
 		&metadata, scratchImg
 	);
