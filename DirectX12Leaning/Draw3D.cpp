@@ -15,7 +15,7 @@
 #include "DrawUtility.h"
 #include "Draw3D.h"
 
-Draw3D::Draw3D(DrawShapeData shapeData, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
+Draw3D::Draw3D(const wchar_t *fileName, DrawShapeData shapeData, const float radius, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
 	radius(radius),
 	dev(dev),
 	cmdList(cmdList),
@@ -37,7 +37,7 @@ Draw3D::Draw3D(DrawShapeData shapeData, const float radius, const int fillMode, 
 	SetConstantBufferResourceDescription();
 	SetDescripterHeap();
 	CreateConstantBuffer();
-	CreateTextureData();
+	CreateTextureData(fileName);
 
 	//Top layout
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -359,14 +359,24 @@ void Draw3D::CreateConstantBuffer()
 	this->dev->CreateConstantBufferView(&cbvDesc, basicHeapHandle);
 }
 
-void Draw3D::CreateTextureData()
+void Draw3D::CreateTextureData(const wchar_t *fileName)
 {
-	result = LoadFromWICFile(
-		L"Resources/LOGO_SS.png",
-		DirectX::WIC_FLAGS_NONE,
-		&metadata, scratchImg
-	);
-	assert(result == S_OK);
+	if (fileName == nullptr) {
+		result = LoadFromWICFile(
+			L"Resources/Default.png",
+			DirectX::WIC_FLAGS_NONE,
+			&metadata, scratchImg
+		);
+		assert(result == S_OK);
+	}
+	else {
+		result = LoadFromWICFile(
+			fileName,
+			DirectX::WIC_FLAGS_NONE,
+			&metadata, scratchImg
+		);
+		assert(result == S_OK);
+	}
 
 	const DirectX::Image *img = scratchImg.GetImage(0, 0, 0);
 

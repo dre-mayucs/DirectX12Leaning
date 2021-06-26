@@ -83,13 +83,3 @@ struct DrawBoxObjData3D
 		22, 23, 21,
 	};
 };
-
-struct DrawCircleData2D
-{
-
-};
-
-struct DrawBoxData2D
-{
-
-};
