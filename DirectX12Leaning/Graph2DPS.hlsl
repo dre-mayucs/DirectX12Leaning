@@ -5,5 +5,5 @@ SamplerState smp : register(s0);
 
 float4 main(VSOutput input) : SV_TARGET
 {
-    return float4(input.uv, 1, 1);
+    return float4(tex.Sample(smp, input.uv));
 }

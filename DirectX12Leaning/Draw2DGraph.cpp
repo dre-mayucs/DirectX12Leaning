@@ -39,6 +39,7 @@ Draw2DGraph::Draw2DGraph(const unsigned int shapeSize, const float radius, const
 	SetConstantBufferResourceDescription();
 	SetDescripterHeap();
 	CreateConstantBuffer();
+	CreateTextureData();
 
 	//Top layout
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
@@ -89,7 +90,11 @@ void Draw2DGraph::execute(const DirectX::XMFLOAT4 color)
 	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 	//Set constant buffer view
-	cmdList->SetGraphicsRootDescriptorTable(0, basicDescHeap->GetGPUDescriptorHandleForHeapStart());
+	//Set constant buffer view
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuDescHandle = basicDescHeap->GetGPUDescriptorHandleForHeapStart();
+	cmdList->SetGraphicsRootDescriptorTable(0, gpuDescHandle);
+	gpuDescHandle.ptr += this->dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	cmdList->SetGraphicsRootDescriptorTable(1, gpuDescHandle);
 
 	cmdList->IASetVertexBuffers(0, 1, &vbView);
 	cmdList->IASetIndexBuffer(&ibView);
@@ -283,6 +288,8 @@ void Draw2DGraph::SetDescripterHeap()
 
 	result = this->dev->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&basicDescHeap));
 	assert(result == S_OK);
+
+	basicHeapHandle = basicDescHeap->GetCPUDescriptorHandleForHeapStart();
 }
 
 void Draw2DGraph::CreateConstantBuffer()
@@ -290,7 +297,58 @@ void Draw2DGraph::CreateConstantBuffer()
 	//Create const buffer
 	cbvDesc.BufferLocation = constBuff->GetGPUVirtualAddress();
 	cbvDesc.SizeInBytes = (UINT)constBuff->GetDesc().Width;
-	this->dev->CreateConstantBufferView(&cbvDesc, basicDescHeap->GetCPUDescriptorHandleForHeapStart());
+	this->dev->CreateConstantBufferView(&cbvDesc, basicHeapHandle);
+}
+
+void Draw2DGraph::CreateTextureData()
+{
+	result = LoadFromWICFile(
+		L"Resources/LOGO_SS.png",
+		DirectX::WIC_FLAGS_NONE,
+		&metadata, scratchImg
+	);
+	assert(result == S_OK);
+
+	const DirectX::Image *img = scratchImg.GetImage(0, 0, 0);
+
+	texHeapProp.Type = D3D12_HEAP_TYPE_CUSTOM;
+	texHeapProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+	texHeapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+
+	texresDesc.Dimension = static_cast<D3D12_RESOURCE_DIMENSION>(metadata.dimension);
+	texresDesc.Format = metadata.format;
+	texresDesc.Width = metadata.width;
+	texresDesc.Height = (UINT)metadata.height;
+	texresDesc.DepthOrArraySize = (UINT16)metadata.arraySize;
+	texresDesc.MipLevels = (UINT16)metadata.mipLevels;
+	texresDesc.SampleDesc.Count = 1;
+
+	texbuff = nullptr;
+	result = this->dev->CreateCommittedResource(
+		&texHeapProp,
+		D3D12_HEAP_FLAG_NONE,
+		&texresDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&texbuff)
+	);
+
+	result = texbuff->WriteToSubresource(
+		0,
+		nullptr,
+		img->pixels,
+		(UINT)img->rowPitch,
+		(UINT)img->slicePitch
+	);
+
+	basicHeapHandle.ptr += this->dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = 1;
+
+	this->dev->CreateShaderResourceView(texbuff, &srvDesc, basicHeapHandle);
 }
 
 void Draw2DGraph::SetGraphicsPipeLine(const int fillMode)
@@ -330,26 +388,61 @@ void Draw2DGraph::SetRenderTargetBlendDescription()
 
 void Draw2DGraph::SetRootParameter()
 {
+	////root parameter
+	//descRangeCBV.NumDescriptors = 1;
+	//descRangeCBV.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+	//descRangeCBV.BaseShaderRegister = 0;
+	//descRangeCBV.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	////setting root parameter
+	//rootparam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	//rootparam.DescriptorTable.pDescriptorRanges = &descRangeCBV;
+	//rootparam.DescriptorTable.NumDescriptorRanges = 1;
+	//rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
 	//root parameter
+	D3D12_DESCRIPTOR_RANGE descRangeCBV{};
 	descRangeCBV.NumDescriptors = 1;
 	descRangeCBV.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
 	descRangeCBV.BaseShaderRegister = 0;
 	descRangeCBV.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	//setting root parameter
-	rootparam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootparam.DescriptorTable.pDescriptorRanges = &descRangeCBV;
-	rootparam.DescriptorTable.NumDescriptorRanges = 1;
-	rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-}
+	D3D12_DESCRIPTOR_RANGE descRangeSRV{};
+	descRangeSRV.NumDescriptors = 1;
+	descRangeSRV.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descRangeSRV.BaseShaderRegister = 0;
+	descRangeSRV.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-void Draw2DGraph::SetRootSignature()
-{
+	//setting root parameter
+	D3D12_ROOT_PARAMETER rootparam[2] = {};
+	rootparam[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootparam[0].DescriptorTable.pDescriptorRanges = &descRangeCBV;
+	rootparam[0].DescriptorTable.NumDescriptorRanges = 1;
+	rootparam[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	rootparam[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootparam[1].DescriptorTable.pDescriptorRanges = &descRangeSRV;
+	rootparam[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootparam[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+	D3D12_STATIC_SAMPLER_DESC sampleDesc{};
+	sampleDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampleDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampleDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	sampleDesc.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+	sampleDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	sampleDesc.MaxLOD = D3D12_FLOAT32_MAX;
+	sampleDesc.MinLOD = 0.0f;
+	sampleDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	sampleDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
 	//root signeture
 	rootsignature = nullptr;
 	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	rootSignatureDesc.pParameters = &rootparam;
-	rootSignatureDesc.NumParameters = 1;
+	rootSignatureDesc.pParameters = rootparam;
+	rootSignatureDesc.NumParameters = _countof(rootparam);
+	rootSignatureDesc.pStaticSamplers = &sampleDesc;
+	rootSignatureDesc.NumStaticSamplers = 1;
 
 	rootSigBlob = nullptr;
 	result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
@@ -359,6 +452,24 @@ void Draw2DGraph::SetRootSignature()
 	assert(result == S_OK);
 
 	rootSigBlob->Release();
+}
+
+void Draw2DGraph::SetRootSignature()
+{
+	////root signeture
+	//rootsignature = nullptr;
+	//rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	//rootSignatureDesc.pParameters = &rootparam;
+	//rootSignatureDesc.NumParameters = 1;
+
+	//rootSigBlob = nullptr;
+	//result = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
+	//assert(result == S_OK);
+
+	//result = this->dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
+	//assert(result == S_OK);
+
+	//rootSigBlob->Release();
 }
 
 void Draw2DGraph::SetSignature()

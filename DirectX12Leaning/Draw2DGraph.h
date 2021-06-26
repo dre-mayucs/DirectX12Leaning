@@ -1,4 +1,5 @@
 #pragma once
+#include <DirectXTex.h>
 class Draw2DGraph
 {
 private:
@@ -11,7 +12,6 @@ public:
 	void SetPos(const DirectX::XMFLOAT3 pos);
 
 private:
-	void SetTexture();
 	void SetVertices();
 	void SetHeapProperty();
 	void SetResourceDescription();
@@ -27,6 +27,7 @@ private:
 	void SetConstantBufferResourceDescription();
 	void SetDescripterHeap();
 	void CreateConstantBuffer();
+	void CreateTextureData();
 	void SetGraphicsPipeLine(const int fillMode);
 	void SetRenderTargetBlendDescription();
 	void SetRootParameter();
@@ -60,10 +61,18 @@ private:
 	ID3DBlob *psBlob;
 	ID3DBlob *errorBlob;
 
+	DirectX::TexMetadata metadata;
+	DirectX::ScratchImage scratchImg;
+	D3D12_HEAP_PROPERTIES texHeapProp;
+	D3D12_RESOURCE_DESC texresDesc;
+	ID3D12Resource *texbuff;
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+
 	D3D12_HEAP_PROPERTIES cbheapprop;
 	D3D12_RESOURCE_DESC cbresdesc;
 	ID3D12Resource *constBuff;
 	ID3D12DescriptorHeap *basicDescHeap;
+	D3D12_CPU_DESCRIPTOR_HANDLE basicHeapHandle;
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc;
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 
