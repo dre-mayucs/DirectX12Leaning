@@ -20,7 +20,6 @@ private:
 	Draw3D *drawPlayer;
 
 	Bullet bullet;
-	Draw3D *DrawBullet;
 
 	std::vector<Draw3D *> enemyObject;
 	std::vector<Draw2DGraph*> Background;

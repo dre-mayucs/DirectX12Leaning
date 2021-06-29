@@ -15,9 +15,7 @@ GamePlay::GamePlay(Win32 *win32,DirectX12 *dx12, Input *input, const int window_
 	drawPlayer = new Draw3D(L"Resources/AI.png", DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
 	drawPlayer->SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
 
-	bullet = Bullet(1.0f, 3, input);
-	DrawBullet = new Draw3D(L"Resources/senju.png", DrawShapeData::TriangularPyramid, 2, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
-	DrawBullet->SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
+	bullet = Bullet(1.0f, 3, input, dx12, window_width, window_height);
 
 	enemyObject = std::vector<Draw3D *>(2);
 	for (auto i = 0; i < enemyObject.size(); i++) {
@@ -33,7 +31,6 @@ GamePlay::GamePlay(Win32 *win32,DirectX12 *dx12, Input *input, const int window_
 GamePlay::~GamePlay()
 {
 	delete drawPlayer;
-	delete DrawBullet;
 
 	for (auto v : enemyObject) {
 		delete v;
@@ -82,14 +79,13 @@ void GamePlay::Update()
 			if (enemyTurnFlag[i]) { enemyPos[i].y += enemySpeed[i]; }
 			else { enemyPos[i].y -= enemySpeed[i]; }
 		}
-
-		player.Update();
-		bullet.Update(player.Get3DPoint());
 #pragma endregion
 
 #pragma region DrawProcess
 		//Clear
 		dx12->ClearDrawScreen(dx12->GetColor(100, 200, 255, 255));
+		player.Update();
+		bullet.Update(player.Get3DPoint());
 
 		//Background image
 		for (auto i = 0; i < Background.size(); i++) {
@@ -104,11 +100,6 @@ void GamePlay::Update()
 			if (enemyFlag[i]) {
 				enemyObject[i]->execute(dx12->GetColor(255, 255, 255, 255), DirectX::XMMatrixTranslation(enemyPos[i].x, enemyPos[i].y, enemyPos[i].z));
 			}
-		}
-
-		//projectile
-		if (bullet.GetActiveFlag()) {
-			DrawBullet->execute(dx12->GetColor(138, 119, 183, 255), bullet.GetBulletPositionMatrix());
 		}
 #pragma endregion
 

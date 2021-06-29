@@ -2,6 +2,7 @@
 class PlayerOP
 {
 public:
+	PlayerOP();
 	PlayerOP(float x, float y, float z, float r, Input *input);
 	void Update();
 	const DirectX::XMMATRIX GetPlayerPositionMatrix() const;
