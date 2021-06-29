@@ -16,6 +16,7 @@
 //this
 #include "Draw2DGraph.h"
 
+Draw2DGraph::Draw2DGraph() {}
 Draw2DGraph::Draw2DGraph(const wchar_t *fileName, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height) :
 	dev(dev),
 	cmdList(cmdList),

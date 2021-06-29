@@ -2,6 +2,7 @@
 class Bullet
 {
 public:
+	Bullet();
 	Bullet(float speed, float radius, Input *input);
 	void Update(Position3D playerPos);
 	bool GetCollision(Position3D targetPos, float radius);

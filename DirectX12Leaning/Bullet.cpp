@@ -8,8 +8,11 @@
 //this
 #include "Bullet.h"
 
+Bullet::Bullet() {}
+
 Bullet::Bullet(float speed, float radius, Input *input) : speed(speed), radius(radius), input(input)
 {
+	flag = false;
 	position = { 0.0f, 0.0f, 0.0f };
 }
 

@@ -8,6 +8,7 @@
 //this
 #include "PlayerOP.h"
 
+PlayerOP::PlayerOP() {}
 PlayerOP::PlayerOP(float x, float y, float z, float r, Input *input) : input(input)
 {
 	position.x = x;
