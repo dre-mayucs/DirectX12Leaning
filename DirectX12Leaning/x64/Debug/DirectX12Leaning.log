@@ -1,9 +1,12 @@
-﻿  Bullet.cpp
-  Input.cpp
+﻿  compilation object save succeeded; see F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Debug\Graph2DPS.cso
+  compilation object save succeeded; see F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Debug\Graph2DVS.cso
+  Draw2DGraph.cpp
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2DGraph.cpp(171,62): warning C4267: '=': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2DGraph.cpp(229,62): warning C4267: '=': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+  GamePlay.cpp
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\GamePlay.cpp(73,29): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\GamePlay.cpp(74,34): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
   main.cpp
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\main.cpp(5,12): warning C4244: '引数': 'time_t' から 'unsigned int' への変換です。データが失われる可能性があります。
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\main.cpp(43,30): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\main.cpp(44,29): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
-  PlayerOP.cpp
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\main.cpp(6,12): warning C4244: '引数': 'time_t' から 'unsigned int' への変換です。データが失われる可能性があります。
   コードを生成中...
   DirectX12Leaning.vcxproj -> F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Debug\DirectX12Leaning.exe

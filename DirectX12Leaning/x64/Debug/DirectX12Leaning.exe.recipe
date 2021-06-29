@@ -18,6 +18,12 @@
     <ContentFile>
       <FullPath>F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Debug\BasicVS3D.cso</FullPath>
     </ContentFile>
+    <ContentFile>
+      <FullPath>F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Debug\Graph2DPS.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Debug\Graph2DVS.cso</FullPath>
+    </ContentFile>
   </ContentFiles>
   <SatelliteDlls />
   <NonRecipeFileRefs />

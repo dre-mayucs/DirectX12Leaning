@@ -3,8 +3,7 @@ class Bullet
 {
 public:
 	Bullet();
-	Bullet(float speed, float radius, Input *input, DirectX12 *dx12, const int window_width, const int window_height);
-	~Bullet();
+	Bullet(float speed, float radius, Input *input);
 	void Update(Position3D playerPos);
 	bool GetCollision(Position3D targetPos, float radius);
 	bool GetActiveFlag() const;
@@ -16,11 +15,7 @@ private:
 	float speed;
 	Input *input;
 
-	DirectX12 *dx12;
-
 	float radius;
 	Position3D position;
 	DirectX::XMMATRIX matrixTranslation;
-
-	Draw3D *bullet;
 };

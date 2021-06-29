@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="Basic.hlsli" />
+    <None Include="Graph2DShader.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BasicPS.hlsl">
@@ -164,13 +165,23 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="Graph2DPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Graph2DVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="DirectX12.cpp" />
     <ClCompile Include="Draw2D.cpp" />
+    <ClCompile Include="Draw2DGraph.cpp" />
     <ClCompile Include="Draw3D.cpp" />
     <ClCompile Include="DrawUtility.cpp" />
+    <ClCompile Include="GamePlay.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PlayerOP.cpp" />
@@ -181,8 +192,10 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="DirectX12.h" />
     <ClInclude Include="Draw2D.h" />
+    <ClInclude Include="Draw2DGraph.h" />
     <ClInclude Include="Draw3D.h" />
     <ClInclude Include="DrawUtility.h" />
+    <ClInclude Include="GamePlay.h" />
     <ClInclude Include="includes.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="PlayerOP.h" />

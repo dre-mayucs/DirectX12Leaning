@@ -169,7 +169,7 @@
       <Filter>Shader\Header</Filter>
     </None>
     <None Include="Graph2DShader.hlsli">
-      <Filter>Shader\Header</Filter>
+      <Filter>Shader\2DGraph</Filter>
     </None>
   </ItemGroup>
 </Project>
