@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Win32">
@@ -61,6 +61,12 @@
     <Filter Include="Shader\2DGraph">
       <UniqueIdentifier>{8f7dbd17-dc35-46e1-8e9d-d32a0151981a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{712f2237-4f27-489d-a23f-a394dbac8488}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\MainGameScene">
+      <UniqueIdentifier>{f18590b8-8517-42f3-bc02-f929f8c3c57e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BasicPS3D.hlsl">
@@ -116,6 +122,9 @@
     <ClCompile Include="Draw2DGraph.cpp">
       <Filter>DirectX12\Draw\2DGraph</Filter>
     </ClCompile>
+    <ClCompile Include="GamePlay.cpp">
+      <Filter>Scene\MainGameScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Win32.h">
@@ -150,6 +159,9 @@
     </ClInclude>
     <ClInclude Include="Draw2DGraph.h">
       <Filter>DirectX12\Draw\2DGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="GamePlay.h">
+      <Filter>Scene\MainGameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
