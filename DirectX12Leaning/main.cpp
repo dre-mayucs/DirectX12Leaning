@@ -16,28 +16,28 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 	ID3D12GraphicsCommandList *cmdList = dx12.GetCommandList();
 
 	//PLayer
+	PlayerOP player(0, 0, 0, 5, input);
 	Draw3D drawPlayer(L"Resources/AI.png", DrawShapeData::TriangularPyramid, 5, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
 	drawPlayer.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
-	PlayerOP player(0, 0, 0, 5, input);
 
 	//Projectile
-	Draw3D DrawBullet(nullptr, DrawShapeData::TriangularPyramid, 2, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
-	DrawBullet.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
 	Bullet bullet(1.0f, 3, input);
+	Draw3D DrawBullet(L"Resources/senju.png", DrawShapeData::TriangularPyramid, 2, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	DrawBullet.SetRotation(DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(-90.0f)));
 
 	//DrawObject
 	Position3D enemyPos[2] = {
 		{20, rand() % 50 - 25, 0},
-		{20, rand() % 50 - 25, 0} }
-	;
+		{20, rand() % 50 - 25, 0}
+	};
 
 	bool enemyFlag[2] = { true, true };
 	bool enemyTurnFlag[2] = { false, false };
 	int enemyWaitTime[2] = { 0, 0 };
 	float enemySpeed[2] = { 0.5f, 1.0f };
 
-	Draw3D enemyObject (nullptr, DrawShapeData::Box, 2, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
-	Draw3D enemyObject2(nullptr, DrawShapeData::Box, 2, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	Draw3D enemyObject (L"Resources/seven.png", DrawShapeData::Box, 2, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
+	Draw3D enemyObject2(L"Resources/seven.png", DrawShapeData::Box, 2, D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
 
 	Draw2DGraph BG0(L"Resources/data.png", D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
 	Draw2DGraph BG1(L"Resources/data.png", D3D12_FILL_MODE_SOLID, dev, cmdList, window_width, window_height);
@@ -84,7 +84,6 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 		bullet.Update(player.Get3DPoint());
 #pragma endregion
 
-
 #pragma region DrawProcess
 		//Clear
 		dx12.ClearDrawScreen(dx12.GetColor(100, 200, 255, 255));
@@ -98,12 +97,12 @@ int WINAPI WinMain(_In_ HINSTANCE hinstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		//enemy
 		if (enemyFlag[0]) {
-			enemyObject.execute(dx12.GetColor(0, 200, 255, 255), DirectX::XMMatrixTranslation(enemyPos[0].x, enemyPos[0].y, enemyPos[0].z));
+			enemyObject.execute(dx12.GetColor(255, 255, 255, 255), DirectX::XMMatrixTranslation(enemyPos[0].x, enemyPos[0].y, enemyPos[0].z));
 		}
 		if (enemyFlag[1]) {
-			enemyObject2.execute(dx12.GetColor(255, 153, 255, 255), DirectX::XMMatrixTranslation(enemyPos[1].x, enemyPos[1].y, enemyPos[1].z));
+			enemyObject2.execute(dx12.GetColor(255, 255, 255, 255), DirectX::XMMatrixTranslation(enemyPos[1].x, enemyPos[1].y, enemyPos[1].z));
 		}
-
+		
 		//projectile
 		if (bullet.GetActiveFlag()) {
 			DrawBullet.execute(dx12.GetColor(138, 119, 183, 255), bullet.GetBulletPositionMatrix());
