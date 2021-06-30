@@ -1,28 +1,26 @@
-﻿  Bullet.cpp
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
-  DirectX12.cpp
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\DirectX12.cpp(181,19): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\DirectX12.cpp(182,20): warning C4244: '=': conversion from 'int' to 'FLOAT', possible loss of data
+﻿  compilation object save succeeded; see F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\BasicPS.cso
+  compilation object save succeeded; see F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\BasicPS3D.cso
+  compilation object save succeeded; see F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\BasicVS.cso
+  compilation object save succeeded; see F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\BasicVS3D.cso
+  compilation object save succeeded; see F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\Graph2DPS.cso
+  compilation object save succeeded; see F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\Graph2DVS.cso
   Draw2D.cpp
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2D.cpp(109,21): warning C4018: '<': signed/unsigned mismatch
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2D.cpp(164,66): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2D.cpp(171,20): warning C4018: '<': signed/unsigned mismatch
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2D.cpp(229,62): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2D.cpp(109,21): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2D.cpp(164,66): warning C4267: '=': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2D.cpp(171,20): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2D.cpp(229,62): warning C4267: '=': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+  Draw2DGraph.cpp
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2DGraph.cpp(171,62): warning C4267: '=': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw2DGraph.cpp(229,62): warning C4267: '=': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
   Draw3D.cpp
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw3D.cpp(212,57): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw3D.cpp(261,62): warning C4267: '=': conversion from 'size_t' to 'UINT', possible loss of data
-  DrawUtility.cpp
-  main.cpp
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\main.cpp(5,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\main.cpp(43,30): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\main.cpp(44,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-  PlayerOP.cpp
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\um\dinput.h: DIRECTINPUT_VERSION undefined. Defaulting to version 0x0800
-  tempUtility.cpp
-  Generating code
-  57 of 407 functions (14.0%) were compiled, the rest were copied from previous compilation.
-    13 functions were new in current compilation
-    24 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw3D.cpp(230,57): warning C4267: '=': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\Draw3D.cpp(279,62): warning C4267: '=': 'size_t' から 'UINT' に変換しました。データが失われているかもしれません。
+  GamePlay.cpp
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\GamePlay.cpp(137,28): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
+F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\GamePlay.cpp(138,33): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
+  コード生成しています。
+  4 of 561 functions ( 0.7%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
+  コード生成が終了しました。
   DirectX12Leaning.vcxproj -> F:\Dev\GitHub\DirectX12Leaning\DirectX12Leaning\x64\Release\DirectX12Leaning.exe

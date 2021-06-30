@@ -7,6 +7,10 @@ public:
 	void Update();
 
 private:
+	void Title();
+	void GameScene();
+
+private:
 	Win32 *win32;
 	DirectX12 *dx12;
 	ID3D12Device *dev;
@@ -35,5 +39,13 @@ private:
 	int enemyWaitTime[2]	= { 0,		0 };
 	float enemySpeed[2]		= { 0.5f,	1.0f };
 	float xAdjust[2]		= { 0, 2 };
+
+	Draw2DGraph *TitleBG;
+	Draw2DGraph *TitleMessage;
+	Draw2DGraph *BackHome;
+	bool titleFlag;
+	float alpha;
+	int SceneNum;
+	int Timer;
 };
 

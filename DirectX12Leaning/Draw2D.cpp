@@ -237,7 +237,7 @@ void Draw2D::SetShader()
 	errorBlob = nullptr;
 
 	result = D3DCompileFromFile(
-		L"BasicVS.hlsl",
+		L"Shaders/BasicVS.hlsl",
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main", "vs_5_0",
@@ -248,7 +248,7 @@ void Draw2D::SetShader()
 	assert(result == S_OK);
 
 	result = D3DCompileFromFile(
-		L"BasicPS.hlsl",
+		L"Shaders/BasicPS.hlsl",
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main", "ps_5_0",

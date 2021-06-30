@@ -237,7 +237,7 @@ void Draw2DGraph::SetShader()
 	errorBlob = nullptr;
 
 	result = D3DCompileFromFile(
-		L"Graph2DVS.hlsl",
+		L"Shaders/Graph2DVS.hlsl",
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main", "vs_5_0",
@@ -248,7 +248,7 @@ void Draw2DGraph::SetShader()
 	assert(result == S_OK);
 
 	result = D3DCompileFromFile(
-		L"Graph2DPS.hlsl",
+		L"Shaders/Graph2DPS.hlsl",
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main", "ps_5_0",
