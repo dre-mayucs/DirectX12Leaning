@@ -25,7 +25,7 @@
     - VisualStudio2019以降で開きプロジェクトを右クリック -> 追加から既存の項目で含まれていないコードを追加してください    
 
 - **オンボードGPUで実行している**  
-    - DirectX12.cpp -> D3D12SelectGPUのNegative keywordsを書きかえてください   
+    - `DirectX12.cpp -> D3D12SelectGPU`の`Negative keywords`を書きかえてください   
 
 - **DirectX12がPCに対応していない**  
     - 対応したOS/ハードウェアで実行してください  
