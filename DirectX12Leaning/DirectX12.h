@@ -1,4 +1,6 @@
 #pragma once
+#include <wrl.h>
+
 enum class SelectVSYNC {
 	DisableVSYNC,
 	EnableVSYNC
@@ -6,9 +8,14 @@ enum class SelectVSYNC {
 
 class DirectX12
 {
+private:
+	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+
 public: //Public function
 	//Initialize
 	DirectX12(HWND hwnd, const int window_width, const int window_height, SelectVSYNC vsync = SelectVSYNC::EnableVSYNC);
+	~DirectX12();
+
 	void Initialize_components();
 
 	//color getter
@@ -22,8 +29,8 @@ public: //Public function
 	void ScreenFlip();
 
 private:
-	ID3D12Device *dev;
-	ID3D12GraphicsCommandList *cmdList;
+	ComPtr<ID3D12Device> dev;
+	ComPtr<ID3D12GraphicsCommandList> cmdList;
 	//ID3D12DescriptorHeap *dsvHeap;
 
 private:
@@ -62,9 +69,9 @@ private:
 	int VSYNCMode;
 
 	//GPU
-	std::vector<IDXGIAdapter1 *> adapters;
+	std::vector<ComPtr<IDXGIAdapter1>> adapters;
 	IDXGIAdapter1 *tmpAdapter;
-	IDXGIFactory6 *dxgiFactory;
+	ComPtr<IDXGIFactory6> dxgiFactory;
 	D3D_FEATURE_LEVEL featurelevel;
 	D3D_FEATURE_LEVEL levels[4] = {
 		D3D_FEATURE_LEVEL_12_1,
@@ -87,7 +94,7 @@ private:
 	D3D12_DESCRIPTOR_HEAP_DESC heapDesc;
 
 	//Target view
-	std::vector<ID3D12Resource *> backBuffers = std::vector<ID3D12Resource *>(2);
+	std::vector<ComPtr<ID3D12Resource>> backBuffers = std::vector<ComPtr<ID3D12Resource>>(2);
 
 	//Fence
 	ID3D12Fence *fence;

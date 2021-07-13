@@ -1,6 +1,7 @@
 //API(Win)
 #include <Windows.h>
 #include <d3d12.h>
+#include <d3dx12.h>
 #include <dxgi1_6.h>
 #include <DirectXMath.h>
 #pragma comment(lib, "d3d12.lib")
@@ -53,6 +54,16 @@ DirectX12::DirectX12(HWND hwnd, const int window_width, const int window_height,
 	barrierDesc = {};
 }
 
+DirectX12::~DirectX12()
+{
+	delete tmpAdapter;
+	delete cmdAllocator;
+	delete cmdQueue;
+	delete swapchain;
+	delete rtvHeaps;
+	delete fence;
+}
+
 void DirectX12::Initialize_components()
 {
 	//Initiaize GPU
@@ -86,12 +97,12 @@ DirectX::XMFLOAT4 DirectX12::GetColor(const float R, const float G, const float 
 
 ID3D12Device *DirectX12::GetDevice()
 {
-	return dev;
+	return dev.Get();
 }
 
 ID3D12GraphicsCommandList *DirectX12::GetCommandList()
 {
-	return cmdList;
+	return cmdList.Get();
 }
 
 void DirectX12::ClearDrawScreen(const DirectX::XMFLOAT4 color)
@@ -100,7 +111,7 @@ void DirectX12::ClearDrawScreen(const DirectX::XMFLOAT4 color)
 	UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
 
 	//Resources barrier(change OP)
-	barrierDesc.Transition.pResource = backBuffers[bbIndex];
+	barrierDesc.Transition.pResource = backBuffers[bbIndex].Get();
 	barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;		//view
 	barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;	//draw
 	cmdList->ResourceBarrier(1, &barrierDesc);
@@ -149,7 +160,7 @@ void DirectX12::ScreenFlip()
 	cmdList->Close();
 
 	//Run commandlist
-	ID3D12CommandList *cmdLists[] = { cmdList };
+	ID3D12CommandList *cmdLists[] = { cmdList.Get() };
 	cmdQueue->ExecuteCommandLists(1, cmdLists);
 
 	//awaiting run commandlist
@@ -226,7 +237,7 @@ void DirectX12::D3D12SelectGPU()
 
 		//Negative keywords
 		if (strDesc.find(L"Intel") == std::wstring::npos) {
-			tmpAdapter = adapters[i];
+			tmpAdapter = adapters[i].Get();
 			break;
 		}
 	}
@@ -293,6 +304,8 @@ void DirectX12::D3D12SetSwapchainDescription()
 	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
+	//ComPtr<IDXGISwapChain1> swapChain1;
+
 	dxgiFactory->CreateSwapChainForHwnd(
 		cmdQueue,
 		hwnd,
@@ -301,6 +314,7 @@ void DirectX12::D3D12SetSwapchainDescription()
 		nullptr,
 		(IDXGISwapChain1 **)&swapchain
 	);
+	//swapChain1.As(&swapchain);
 }
 #pragma endregion
 
@@ -326,7 +340,7 @@ void DirectX12::D3D12SetTargetView()
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
 		handle.ptr += i * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
 		dev->CreateRenderTargetView(
-			backBuffers[i],
+			backBuffers[i].Get(),
 			nullptr,
 			handle
 		);
