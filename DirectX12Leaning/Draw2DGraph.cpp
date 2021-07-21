@@ -23,6 +23,9 @@ Draw2DGraph::Draw2DGraph(const wchar_t *fileName, const int fillMode, ID3D12Devi
 	window_width(window_width),
 	window_height(window_height)
 {
+	matrix = DirectX::XMMatrixIdentity();
+	matProjection = DirectX::XMMatrixOrthographicOffCenterLH(0.0f, (float)window_width, (float)window_height, 0.0f, 0.0f, 1.0f);
+
 	SetVertices();
 	SetHeapProperty();
 	SetResourceDescription();
@@ -62,7 +65,15 @@ Draw2DGraph::Draw2DGraph(const wchar_t *fileName, const int fillMode, ID3D12Devi
 	SetSignature();
 }
 
-void Draw2DGraph::execute(const DirectX::XMFLOAT4 color, const float adjustXPos)
+void Draw2DGraph::Update(float x, float y, float rotate)
+{
+	matrix = DirectX::XMMatrixIdentity();
+	matrix *= DirectX::XMMatrixRotationZ(rotate);
+	//matrix *= DirectX::XMMatrixTranslation(x, y, 0.f);
+	matrix *= matProjection;
+}
+
+void Draw2DGraph::execute(const DirectX::XMFLOAT4 color, const float adjustXPos, const float adjustYPos)
 {
 	//Get VirtualMemory
 	Graph2DVertex *vertMap = nullptr;
@@ -86,9 +97,10 @@ void Draw2DGraph::execute(const DirectX::XMFLOAT4 color, const float adjustXPos)
 	verBuff->Unmap(0, nullptr);
 
 	//Initialize const buffer
-	ConstBufferData *constMap = nullptr;
+	ConstBufferData3D *constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void **)&constMap);
 	constMap->color = color;
+	constMap->mat = matrix;
 	constBuff->Unmap(0, nullptr);
 	assert(result == S_OK);
 
@@ -269,7 +281,7 @@ void Draw2DGraph::SetConstantBufferResourceDescription()
 {
 	//Resources
 	cbresdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	cbresdesc.Width = (sizeof(ConstBufferData) + 0xff) & ~0xff;
+	cbresdesc.Width = (sizeof(ConstBufferData3D) + 0xff) & ~0xff;
 	cbresdesc.Height = 1;
 	cbresdesc.DepthOrArraySize = 1;
 	cbresdesc.MipLevels = 1;

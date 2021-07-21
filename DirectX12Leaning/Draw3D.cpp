@@ -185,36 +185,47 @@ void Draw3D::SetShape(DrawShapeData shapeData)
 
 void Draw3D::SetHeapProperty()
 {
-	//Set vertex buffer
-	heapprop = {};
-	heapprop.Type = D3D12_HEAP_TYPE_UPLOAD;	//Transfer to GPU
-	heapprop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	heapprop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	////Set vertex buffer
+	//heapprop = {};
+	//heapprop.Type = D3D12_HEAP_TYPE_UPLOAD;	//Transfer to GPU
+	//heapprop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	//heapprop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 }
 
 void Draw3D::SetResourceDescription()
 {
-	//Resource setting
-	resdesc = {};
-	resdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	resdesc.Width = sizeVB;
-	resdesc.Height = 1;
-	resdesc.DepthOrArraySize = 1;
-	resdesc.MipLevels = 1;
-	resdesc.Format = DXGI_FORMAT_UNKNOWN;
-	resdesc.SampleDesc.Count = 1;
-	resdesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-	resdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	////Resource setting
+	//resdesc = {};
+	//resdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	//resdesc.Width = sizeVB;
+	//resdesc.Height = 1;
+	//resdesc.DepthOrArraySize = 1;
+	//resdesc.MipLevels = 1;
+	//resdesc.Format = DXGI_FORMAT_UNKNOWN;
+	//resdesc.SampleDesc.Count = 1;
+	//resdesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+	//resdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 }
 
 void Draw3D::CreateVertexBuffer()
 {
-	//Create top buffer
+	////Create top buffer
+	//verBuff = nullptr;
+	//result = this->dev->CreateCommittedResource(
+	//	&heapprop,
+	//	D3D12_HEAP_FLAG_NONE,
+	//	&resdesc,
+	//	D3D12_RESOURCE_STATE_GENERIC_READ,
+	//	nullptr,
+	//	IID_PPV_ARGS(&verBuff)
+	//);
+	//assert(result == S_OK);
+
 	verBuff = nullptr;
 	result = this->dev->CreateCommittedResource(
-		&heapprop,
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
-		&resdesc,
+		&CD3DX12_RESOURCE_DESC::Buffer(sizeVB),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&verBuff)
@@ -237,9 +248,9 @@ void Draw3D::SetIndexBuffer()
 	indexBuff = nullptr;
 	resdesc.Width = sizeof(unsigned short) * indices.size();
 	result = this->dev->CreateCommittedResource(
-		&heapprop,
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
-		&resdesc,
+		&CD3DX12_RESOURCE_DESC::Buffer(indices.size()),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&indexBuff)
@@ -317,21 +328,31 @@ void Draw3D::SetConstantBufferHeapProperty()
 
 void Draw3D::SetConstantBufferResourceDescription()
 {
-	//Resources
-	cbresdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	cbresdesc.Width = (sizeof(ConstBufferData) + 0xff) & ~0xff;
-	cbresdesc.Height = 1;
-	cbresdesc.DepthOrArraySize = 1;
-	cbresdesc.MipLevels = 1;
-	cbresdesc.SampleDesc.Count = 1;
-	cbresdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	////Resources
+	//cbresdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	//cbresdesc.Width = (sizeof(ConstBufferData) + 0xff) & ~0xff;
+	//cbresdesc.Height = 1;
+	//cbresdesc.DepthOrArraySize = 1;
+	//cbresdesc.MipLevels = 1;
+	//cbresdesc.SampleDesc.Count = 1;
+	//cbresdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
-	//Create
-	constBuff = nullptr;
+	////Create
+	//constBuff = nullptr;
+	//result = this->dev->CreateCommittedResource(
+	//	&cbheapprop,
+	//	D3D12_HEAP_FLAG_NONE,
+	//	&cbresdesc,
+	//	D3D12_RESOURCE_STATE_GENERIC_READ,
+	//	nullptr,
+	//	IID_PPV_ARGS(&constBuff)
+	//);
+
+	UINT64 buffSize = (sizeof(ConstBufferData) + 0xff) & ~0xff;
 	result = this->dev->CreateCommittedResource(
-		&cbheapprop,
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
-		&cbresdesc,
+		&CD3DX12_RESOURCE_DESC::Buffer(buffSize),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&constBuff)
@@ -381,21 +402,29 @@ void Draw3D::CreateTextureData(const wchar_t *fileName)
 
 	const DirectX::Image *img = scratchImg.GetImage(0, 0, 0);
 
-	texHeapProp.Type = D3D12_HEAP_TYPE_CUSTOM;
+	/*texHeapProp.Type = D3D12_HEAP_TYPE_CUSTOM;
 	texHeapProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-	texHeapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+	texHeapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;*/
 
-	texresDesc.Dimension = static_cast<D3D12_RESOURCE_DIMENSION>(metadata.dimension);
+	/*texresDesc.Dimension = static_cast<D3D12_RESOURCE_DIMENSION>(metadata.dimension);
 	texresDesc.Format = metadata.format;
 	texresDesc.Width = metadata.width;
 	texresDesc.Height = (UINT)metadata.height;
 	texresDesc.DepthOrArraySize = (UINT16)metadata.arraySize;
 	texresDesc.MipLevels = (UINT16)metadata.mipLevels;
-	texresDesc.SampleDesc.Count = 1;
+	texresDesc.SampleDesc.Count = 1;*/
+
+	texresDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+		metadata.format,
+		(UINT64)metadata.width,
+		(UINT)metadata.height,
+		(UINT16)metadata.arraySize,
+		(UINT16)metadata.mipLevels
+	);
 
 	texbuff = nullptr;
 	result = this->dev->CreateCommittedResource(
-		&texHeapProp,
+		&CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0),
 		D3D12_HEAP_FLAG_NONE,
 		&texresDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
@@ -467,29 +496,47 @@ void Draw3D::MappingConstBuffer()
 
 void Draw3D::SetDepthCulling()
 {
-	depthResDesc = {};
+	depthResDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+		DXGI_FORMAT_D32_FLOAT,
+		window_width,
+		window_height,
+		1, 0,
+		1, 0,
+		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL
+	);
+
+	/*depthResDesc = {};
 	depthResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	depthResDesc.Width = window_width;
 	depthResDesc.Height = window_height;
 	depthResDesc.DepthOrArraySize = 1;
 	depthResDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	depthResDesc.SampleDesc.Count = 1;
-	depthResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+	depthResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;*/
 
-	depthHeapProp = {};
+	/*depthHeapProp = {};
 	depthHeapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
 
 	depthClearValue = {};
 	depthClearValue.DepthStencil.Depth = 1.0f;
-	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;*/
 
-	depthBuffer = nullptr;
+	/*depthBuffer = nullptr;
 	result = this->dev->CreateCommittedResource(
 		&depthHeapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&depthResDesc,
 		D3D12_RESOURCE_STATE_DEPTH_WRITE,
 		&depthClearValue,
+		IID_PPV_ARGS(&depthBuffer)
+	);*/
+	depthBuffer = nullptr;
+	result = this->dev->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		D3D12_HEAP_FLAG_NONE,
+		&depthResDesc,
+		D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		&CD3DX12_CLEAR_VALUE(DXGI_FORMAT_D32_FLOAT, 1.0f, 0),
 		IID_PPV_ARGS(&depthBuffer)
 	);
 
@@ -538,19 +585,23 @@ void Draw3D::SetGraphicsPipeLine(const int fillMode)
 {
 	//Graphics pipeline
 	gpipeline.pRootSignature = nullptr;
-	gpipeline.VS.pShaderBytecode = vsBlob->GetBufferPointer();
+	/*gpipeline.VS.pShaderBytecode = vsBlob->GetBufferPointer();
 	gpipeline.VS.BytecodeLength = vsBlob->GetBufferSize();
 	gpipeline.PS.pShaderBytecode = psBlob->GetBufferPointer();
-	gpipeline.PS.BytecodeLength = psBlob->GetBufferSize();
+	gpipeline.PS.BytecodeLength = psBlob->GetBufferSize();*/
+
+	gpipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob);
+	gpipeline.PS = CD3DX12_SHADER_BYTECODE(psBlob);
 
 	//SampleMask
 	//RasterizerState
 	//Fill mode
 	gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	gpipeline.RasterizerState.MultisampleEnable = false;
+	/*gpipeline.RasterizerState.MultisampleEnable = false;
 	gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
 	gpipeline.RasterizerState.FillMode = (D3D12_FILL_MODE)fillMode;
-	gpipeline.RasterizerState.DepthClipEnable = true;
+	gpipeline.RasterizerState.DepthClipEnable = true;*/
+	gpipeline.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 }
 
 void Draw3D::SetRenderTargetBlendDescription()
@@ -583,32 +634,39 @@ void Draw3D::SetRootParameter()
 	//rootparam.DescriptorTable.NumDescriptorRanges = 1;
 	//rootparam.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
-	//root parameter
-	D3D12_DESCRIPTOR_RANGE descRangeCBV{};
-	descRangeCBV.NumDescriptors = 1;
-	descRangeCBV.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-	descRangeCBV.BaseShaderRegister = 0;
-	descRangeCBV.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	////root parameter
+	//D3D12_DESCRIPTOR_RANGE descRangeCBV{};
+	//descRangeCBV.NumDescriptors = 1;
+	//descRangeCBV.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+	//descRangeCBV.BaseShaderRegister = 0;
+	//descRangeCBV.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_DESCRIPTOR_RANGE descRangeSRV{};
-	descRangeSRV.NumDescriptors = 1;
-	descRangeSRV.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	descRangeSRV.BaseShaderRegister = 0;
-	descRangeSRV.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	//D3D12_DESCRIPTOR_RANGE descRangeSRV{};
+	//descRangeSRV.NumDescriptors = 1;
+	//descRangeSRV.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	//descRangeSRV.BaseShaderRegister = 0;
+	//descRangeSRV.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	//setting root parameter
-	D3D12_ROOT_PARAMETER rootparam[2] = {};
-	rootparam[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootparam[0].DescriptorTable.pDescriptorRanges = &descRangeCBV;
-	rootparam[0].DescriptorTable.NumDescriptorRanges = 1;
-	rootparam[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	////setting root parameter
+	//D3D12_ROOT_PARAMETER rootparam[2] = {};
+	//rootparam[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	//rootparam[0].DescriptorTable.pDescriptorRanges = &descRangeCBV;
+	//rootparam[0].DescriptorTable.NumDescriptorRanges = 1;
+	//rootparam[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
-	rootparam[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootparam[1].DescriptorTable.pDescriptorRanges = &descRangeSRV;
-	rootparam[1].DescriptorTable.NumDescriptorRanges = 1;
-	rootparam[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	//rootparam[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	//rootparam[1].DescriptorTable.pDescriptorRanges = &descRangeSRV;
+	//rootparam[1].DescriptorTable.NumDescriptorRanges = 1;
+	//rootparam[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	CD3DX12_DESCRIPTOR_RANGE descRangeCBV, descRangeSRV;
+	descRangeCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-	D3D12_STATIC_SAMPLER_DESC sampleDesc{};
+	CD3DX12_ROOT_PARAMETER rootparam[2];
+	rootparam[0].InitAsDescriptorTable(1, &descRangeCBV);
+	rootparam[1].InitAsDescriptorTable(1, &descRangeSRV);
+
+	/*D3D12_STATIC_SAMPLER_DESC sampleDesc{};
 	sampleDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	sampleDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	sampleDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -617,7 +675,8 @@ void Draw3D::SetRootParameter()
 	sampleDesc.MaxLOD = D3D12_FLOAT32_MAX;
 	sampleDesc.MinLOD = 0.0f;
 	sampleDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-	sampleDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	sampleDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;*/
+	CD3DX12_STATIC_SAMPLER_DESC sampleDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
 
 	//root signeture
 	rootsignature = nullptr;
@@ -661,9 +720,10 @@ void Draw3D::SetSignature()
 	gpipeline.pRootSignature = rootsignature;
 
 	//SetZBuffer
-	gpipeline.DepthStencilState.DepthEnable = true;
+	/*gpipeline.DepthStencilState.DepthEnable = true;
 	gpipeline.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	gpipeline.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+	gpipeline.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;*/
+	gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	gpipeline.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 
 	pipelinestate = nullptr;

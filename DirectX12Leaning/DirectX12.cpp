@@ -117,36 +117,17 @@ void DirectX12::ClearDrawScreen(const DirectX::XMFLOAT4 color)
 	cmdList->ResourceBarrier(1, &barrierDesc);
 
 	//Get Render target view discriper heap handle
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvH = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
-	rtvH.ptr += bbIndex * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
+	auto rtvH = CD3DX12_CPU_DESCRIPTOR_HANDLE(
+		rtvHeaps->GetCPUDescriptorHandleForHeapStart(),
+		bbIndex,
+		dev->GetDescriptorHandleIncrementSize(heapDesc.Type)
+	);
+
 	cmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
 
 	//Display clear
 	float clearColor[] = { color.x, color.y, color.z, color.w };
 	cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
-
-
-	////Get buck buffer number
-	//UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
-
-	////Resources barrier(change OP)
-	//D3D12_RESOURCE_BARRIER barrierDesc{};
-	//barrierDesc.Transition.pResource = backBuffers[bbIndex];
-	//barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;		//view
-	//barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;	//draw
-	//cmdList->ResourceBarrier(1, &barrierDesc);
-
-	////Get Render target view discriper heap handle
-	//D3D12_CPU_DESCRIPTOR_HANDLE rtvH = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
-	//rtvH.ptr += bbIndex * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
-
-	//D3D12_CPU_DESCRIPTOR_HANDLE dsvH = dsvHeap->GetCPUDescriptorHandleForHeapStart();
-	//cmdList->OMSetRenderTargets(1, &rtvH, false, &dsvH);
-
-	////Display clear
-	//float clearColor[] = { color.x, color.y, color.z, color.w };
-	//cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
-	//cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	SetScissorrect();
 	SetViewport();
@@ -337,8 +318,12 @@ void DirectX12::D3D12SetTargetView()
 		result = swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
 		assert(result == S_OK);
 
-		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
-		handle.ptr += i * dev->GetDescriptorHandleIncrementSize(heapDesc.Type);
+		CD3DX12_CPU_DESCRIPTOR_HANDLE handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(
+			rtvHeaps->GetCPUDescriptorHandleForHeapStart(),
+			i,
+			dev->GetDescriptorHandleIncrementSize(heapDesc.Type)
+		);
+
 		dev->CreateRenderTargetView(
 			backBuffers[i].Get(),
 			nullptr,

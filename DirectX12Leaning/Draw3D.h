@@ -1,5 +1,6 @@
 #pragma once
 #include <DirectXTex.h>
+#include <d3dx12.h>
 
 enum class DrawShapeData {
 	TriangularPyramid,
@@ -84,7 +85,7 @@ private:
 	DirectX::TexMetadata metadata;
 	DirectX::ScratchImage scratchImg;
 	D3D12_HEAP_PROPERTIES texHeapProp;
-	D3D12_RESOURCE_DESC texresDesc;
+	CD3DX12_RESOURCE_DESC texresDesc;
 	ID3D12Resource *texbuff;
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 
@@ -100,7 +101,7 @@ private:
 	float angle;
 
 	ConstBufferData3D *constMap;
-	D3D12_RESOURCE_DESC depthResDesc{};
+	CD3DX12_RESOURCE_DESC depthResDesc;
 	D3D12_HEAP_PROPERTIES depthHeapProp{};
 	D3D12_CLEAR_VALUE depthClearValue{};
 	ID3D12Resource *depthBuffer;

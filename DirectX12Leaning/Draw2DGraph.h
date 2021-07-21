@@ -9,7 +9,9 @@ private:
 public:
 	Draw2DGraph();
 	Draw2DGraph(const wchar_t *fileName, const int fillMode, ID3D12Device *dev, ID3D12GraphicsCommandList *cmdList, const int window_width, const int window_height);
-	void execute(const DirectX::XMFLOAT4 color, const float adjustXPos);
+	void Update(float x, float y, float rotate);
+	void execute(const DirectX::XMFLOAT4 color);
+	void execute(const DirectX::XMFLOAT4 color, const float adjustXPos = 0, const float adjustYPos = 0);
 
 private:
 	void SetVertices();
@@ -45,6 +47,9 @@ private:
 	ID3D12GraphicsCommandList *cmdList;
 
 private:
+	DirectX::XMMATRIX matProjection;
+	DirectX::XMMATRIX matrix;
+
 	D3D12_HEAP_PROPERTIES heapprop;
 	D3D12_RESOURCE_DESC resdesc;
 	ID3D12Resource *verBuff;

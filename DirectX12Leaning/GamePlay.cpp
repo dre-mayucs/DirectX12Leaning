@@ -104,6 +104,7 @@ void GamePlay::Title()
 #pragma endregion
 
 #pragma region DrawProcess
+	//TitleBG->Update(window_width / 2, window_height / 2, 20);
 	TitleBG->execute(dx12->GetColor(255, 255, 255, alpha), 0.0f);
 
 	if (Timer <= 30) {
