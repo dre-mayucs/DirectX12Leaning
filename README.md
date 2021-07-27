@@ -3,7 +3,12 @@
 ![lang](https://img.shields.io/badge/Language-C%2B%2B%2FHLSL-blue?style=flat-square)
 ![Type](https://img.shields.io/badge/Type-Desktop-blue?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20x64-blue?style=flat-square)
-# DirectX12Leaning
+
+<h3 align="center">※現在特大メモリリークの修正(作り直し)中です。</h3>
+<p align="center">※ComPtr等への置き換えやdelete処理を自分で できない/したくない 方は危険ですので使用しないでください。</p>
+
+# DirectX12Leaning 
+
 これは僕が学習用に開発している描画エンジン/ライブラリであり、実務用途での使用を想定していません。  
 また個人開発用途での使用も想定しておりませんので使用の際は自己責任でお願いします。  
 以下の環境は必須環境です。  
